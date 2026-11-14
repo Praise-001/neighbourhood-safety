@@ -9,7 +9,7 @@ Lanes: `infra` `api` `web` `mobile` `shared`
 ---
 
 ## Phase 0: Plan (human approval gate)
-- [ ] P0-01 `shared` Agent produces plan: architecture summary, folder structure, risks, assumptions
+- [x] P0-01 `shared` Agent produces plan: architecture summary, folder structure, risks, assumptions (docs/PLAN.md complete)
 - [ ] P0-02 `shared` Human reviews and says "go"
 
 ## Phase 1: Foundation
