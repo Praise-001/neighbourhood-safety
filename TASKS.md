@@ -1,87 +1,62 @@
-# TASKS.md: Lean plan (zero-cost academic scope, see docs/adr/0003-zero-cost-student-scope.md)
+# TASKS.md: 14-hour sprint (replaces all earlier task lists)
 
-Legend: `[ ]` todo · `[~]` in progress (agent + branch) · `[x]` done · `[!]` blocked (reason)
-Task IDs: `P<phase>-<nn>`. Every task ends with the Definition of Done in `docs/WORKFLOW.md` (lean: tests, lint, typecheck, RLS/authz checks, checklist rows, docs).
-Lanes: `app` (Next.js) · `db` (Supabase SQL/RLS) · `infra` (CI, config)
+Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. Each block has a time budget; if a block runs over, drop its optional items and move on. Legend: `[ ]` todo · `[x]` done.
 
-**Current phase:** 0
+## Block 0: Setup (45 min)
+- [ ] S0-01 Create the Next.js app in the repo root (TypeScript, Tailwind, App Router) with pnpm.
+- [ ] S0-02 Theme: navy, yellow, white tokens; light and dark with a toggle; disclaimer banner.
+- [ ] S0-03 **Owner action:** create the free Supabase project (agent gives exact steps); enable `postgis`; put the URL and anon key in `.env.local`; add `.env.example`.
+- [ ] S0-04 Basic security headers in `next.config`.
 
----
+## Block 1: Database (60 min)
+- [ ] S1-01 SQL migration (see ADR-0004 "Data shape rule"):
+  - `profiles` (role user or admin, banned flag)
+  - `tickets` (**public columns only**: reference code unique, category, severity, description, status, public location, is_anonymous, created_at, expires_at, flag_count, hidden)
+  - `ticket_private` (ticket id, exact location, reporter id nullable, reporter email hash nullable)
+  - `ticket_updates`, `comments`, `confirmations` (unique per user per ticket), `flags`, `alert_settings` (home location, radius)
+- [ ] S1-02 Row-level security: public can read non-hidden, non-expired rows of `tickets`; `ticket_private` readable only by its owner and admins; only owners and admins change their own rows; only admins can hide or ban.
+- [ ] S1-03 Postgres function returning tickets within a radius of a point and within a bounding box, filtered by category and time.
+- [ ] S1-04 Seed script with about 30 synthetic incidents around one city.
 
-## Phase 0: Re-plan (human approval gate)
-- [x] P0-01 Original plan produced (superseded by ADR-0003)
-- [x] P0-02 `infra` Revise PLAN.md, ARCHITECTURE.md, AGENTS.md, README, STANDARDS_CHECKLIST (N/A rows) to match ADR-0003; verify free tiers with source URLs (no card); keep each doc short
-- [ ] P0-03 Human reviews and says "go"
+## Block 2: Core reporting (120 min)
+- [ ] S2-01 Report form with zod validation: all fields, severity, time, anonymous toggle, email for no-account reports.
+- [ ] S2-02 Location picker: GPS button plus draggable pin on a MapLibre map; address search only on button press (no as-you-type), max one request per second, descriptive User-Agent.
+- [ ] S2-03 Public coordinate rounding for sensitive categories (with unit tests).
+- [ ] S2-04 Photo upload: re-encode in the browser to strip location data, limit type and size, store in Supabase Storage.
+- [ ] S2-05 Reference code generator and success screen showing the code; simple public page where entering a code shows that ticket.
+- [ ] S2-06 Simple abuse limit on report creation.
 
-## Phase 1: Foundation
-- [ ] P1-01 `infra` Next.js (TypeScript strict, Tailwind, shadcn/ui, ESLint, Prettier), pnpm, env validation (zod), `.env.example`
-- [ ] P1-02 `app` Theme tokens: navy/yellow/white, light/dark/system, no flash, WCAG AA contrast check
-- [ ] P1-03 `app` Security headers + nonce CSP, safe error handling, request validation helper
-- [ ] P1-04 `db` Supabase project, PostGIS enabled, migration workflow, seed script (synthetic data)
-- [ ] P1-05 `infra` CI: lint, typecheck, unit tests, build, secret scan, dependency audit
-- **Gate:** `pnpm dev` works from a clean clone; CI green; theme toggle works
+## Block 3: Map and detail (120 min)
+- [ ] S3-01 Map page with markers, clustering, and filters by category and time range.
+- [ ] S3-02 Feed list view of the same data, newest first, with distance when location is known.
+- [ ] S3-03 Ticket detail page: info, photo, timeline, comments, "I see this too" button (one per user, atomic).
+- [ ] S3-04 *(optional)* Email magic-link sign-in; signed-in users get their reports linked to them.
 
-## Phase 2: Identity
-- [ ] P2-01 `db` Profiles, roles (user, business member, admin), RLS baseline + RLS tests
-- [ ] P2-02 `app` Email OTP / magic-link sign-in (Supabase Auth), session handling, cookie flags, CSRF-safe patterns
-- [ ] P2-03 `db` Guest identity: hashed email, ticket reference generator (unguessable)
-- [ ] P2-04 `app` Guest return: reference + email, and email-only OTP/magic link; generic errors; rate limits
-- [ ] P2-05 `app` Basic rate limiting (OTP, lookup, ticket create)
-- **Gate:** enumeration, brute-force and RLS tests pass
+## Block 4: Alerts (60 min)
+- [ ] S4-01 Alert settings page: set home on the map, choose radius.
+- [ ] S4-02 Supabase Realtime subscription on `tickets`: when a new ticket is created inside the radius, show an in-app banner; critical severity gets a stronger style.
+- [ ] S4-03 Test with two browser windows: report in one, alert in the other inside the radius, none outside.
 
-## Phase 3: Tickets
-- [ ] P3-01 `db` Tickets schema (categories, severity, status, exact + public location, expiry), RLS
-- [ ] P3-02 `app` Create ticket: guest, signed-in, anonymous (no identity exposed), idempotency key
-- [ ] P3-03 `app` Public coordinate coarsening per category + unit tests
-- [ ] P3-04 `app` Image upload: client-side compression and EXIF strip, type/size limits, Supabase Storage policies
-- [ ] P3-05 `db` Read queries: by id, bounding box, radius, filters, pagination (IDOR-safe via RLS)
-- [ ] P3-06 `app` Timeline updates, comments (sanitized), "I see this too" (atomic, one per user)
-- [ ] P3-07 `db` Auto-expiry job (pg_cron or free scheduled route)
-- [ ] P3-08 `app` Abuse tests: IDOR, mass assignment, upload abuse, XSS payloads, parallel submits
-- **Gate:** privacy tests prove anonymous and coarsening rules
+## Block 5: Trust and admin (60 min)
+- [ ] S5-01 Flag-as-false button; auto-hide at 3 flags.
+- [ ] S5-02 Admin page: list flagged and hidden reports, restore or remove, ban a user.
+- [ ] S5-03 Basic row-level security tests: public data never exposes the reporter, a normal user cannot hide tickets, banned users cannot report, `ticket_private` is not readable by others.
 
-## Phase 4: Web UI
-- [ ] P4-01 `app` Landing page: Report an incident, Track my ticket, Register business, theme toggle, disclaimer banner
-- [ ] P4-02 `app` Entry choice: continue as guest / sign in
-- [ ] P4-03 `app` Ticket form: map pin, geolocation, address search, image, anonymous toggle, business picker
-- [ ] P4-04 `app` Success screen with reference; "Track my ticket" flows
-- [ ] P4-05 `app` Ticket detail page
-- [ ] P4-06 `app` Public map: markers, clustering, filters
-- [ ] P4-07 `app` PWA manifest + service worker; accessibility pass (axe + keyboard); responsive from 320 px
-- [ ] P4-08 `app` Playwright e2e: guest report, return via reference, return via magic link
-- **Gate:** e2e green; accessibility check clean
+## Block 6: Polish and deploy (90 min)
+- [ ] S6-01 Accessibility pass: labels, focus, contrast, works at phone width.
+- [ ] S6-02 Empty, loading and error states on every page.
+- [ ] S6-03 **Owner action:** push the repo to GitHub, then deploy to Vercel (agent gives exact steps); set env vars; check the live link end to end.
+- [ ] S6-04 README with setup steps, a short architecture note, and a future-work list (everything cut in ADR-0004).
 
-## Phase 5: Businesses
-- [ ] P5-01 `db` Businesses, members (owner/responder), service area, RLS tenant isolation
-- [ ] P5-02 `app` Business registration; status pending/verified/rejected
-- [ ] P5-03 `app` Business inbox, status changes, public updates vs internal notes
-- [ ] P5-04 `app` Abuse tests: cross-business access, impersonation
-- **Gate:** tenant isolation tests pass
+## Block 7: Buffer and demo prep (60 min)
+- [ ] S7-01 Fix whatever is broken. Rehearse the demo: report without an account, see it on the map, get an alert in a second window, flag a report, admin removes it.
+- [ ] S7-02 Screenshots for the report.
 
-## Phase 6: Alerts
-- [ ] P6-01 `app` Home area + radius (500 m / 1 km / 5 km), notification preferences, quiet hours
-- [ ] P6-02 `db` Matching with `ST_DWithin`; severity rules (critical bypasses quiet hours); dedupe
-- [ ] P6-03 `app` In-app realtime alerts (Supabase Realtime)
-- [ ] P6-04 `app` Web Push (VAPID) with validated deep link to the ticket
-- **Gate:** report on one device alerts a second device inside the radius, and not outside
+**Planned total:** about 10.5 hours, leaving about 3.5 hours of slack.
 
-## Phase 7: Trust and admin
-- [ ] P7-01 `app` Flags, auto-hide after N flags, block/mute
-- [ ] P7-02 `app` Admin page: moderation queue, remove content, ban user, approve/reject business
-- [ ] P7-03 `db` Simple audit log (append-only) for admin actions
-- [ ] P7-04 `app` Delete my account and data; privacy notice page
-- **Gate:** every admin action appears in the audit log
+**If you fall behind, cut from the bottom of the value list in this order:** S3-04 (magic-link sign-in), then S3-02 (feed list), then the ban feature in S5-02.
 
-## Phase 8: Finish and demo
-- [ ] P8-01 `infra` Deploy to free hosting; verify HTTPS and env config
-- [ ] P8-02 `infra` Seed demo data script (synthetic)
-- [ ] P8-03 `infra` Final pass: checklist rows (done or N/A with reason), README, demo script, "future work" section for the report
-- **Gate:** full demo runs end to end
-
-## Stretch (only if time remains)
-Expo Go mobile client · duplicate-report merging · heat map · reputation score · TOTP for admin
-
----
-## Cross-lane requests
-## Decisions log
-ADR-0002 dependency versioning policy · ADR-0003 zero-cost academic scope
+## Owner touchpoints (the only times the agent should stop)
+1. S0-03 create the Supabase project.
+2. S6-03 GitHub push and Vercel sign-in.
+3. S7-01 check the demo.
