@@ -1,0 +1,13 @@
+# HANDOFF
+
+Append newest entries at the top. Format:
+
+```
+### <date> <agent> <task id>
+Done: ...
+Not done: ...
+Gotchas: ...
+Next step: ...
+```
+
+(No entries yet.)

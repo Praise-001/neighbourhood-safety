@@ -1,0 +1,11 @@
+# Replace @your-org/* with real teams/users. Security-sensitive paths require these reviewers.
+*                               @your-org/maintainers
+/apps/api/src/auth/             @your-org/security
+/apps/api/src/policy/           @your-org/security
+/apps/api/src/privacy/          @your-org/security
+/apps/api/migrations/           @your-org/security @your-org/maintainers
+/packages/shared/               @your-org/maintainers
+/infra/                         @your-org/platform
+/.github/                       @your-org/platform
+/docs/STANDARDS_CHECKLIST.md    @your-org/security
+/SECURITY.md                    @your-org/security
