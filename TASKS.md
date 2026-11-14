@@ -118,4 +118,5 @@ Lanes: `infra` `api` `web` `mobile` `shared`
 (Agents add rows here: `from-lane → to-lane: request`)
 
 ## Decisions log
-(Link ADRs in `docs/adr/`)
+- [ADR-0001: Technology stack](docs/adr/0001-stack.md)
+- [ADR-0002: Dependency versioning and pinning policy](docs/adr/0002-dependency-versioning-policy.md)
