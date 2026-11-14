@@ -30,7 +30,7 @@ Build the platform described in `docs/PRD.md` to the standards in `docs/STANDARD
 - **Never** invent library APIs. Read the official docs and the full error message.
 - **Never** add a paid third-party service without asking. Offer free-tier options first.
 - **Never** do destructive operations (drop tables, force-push, delete branches/buckets) without explicit human approval.
-- Every new endpoint needs: auth, authorization check (IDOR-safe), validation, rate limit, OpenAPI docs, tests, and an audit log entry if it is sensitive.
+- Every route handler, server action, RPC and table: authorization/RLS, validation, rate limit where relevant, tests.
 
 ## Coding conventions
 - TypeScript strict mode, no `any` without a justifying comment.
@@ -38,8 +38,8 @@ Build the platform described in `docs/PRD.md` to the standards in `docs/STANDARD
 - Files: `kebab-case.ts`; classes `PascalCase`; constants `UPPER_SNAKE`.
 - API errors: RFC 7807 problem+json with stable `code`.
 - Timestamps UTC `timestamptz`; IDs UUIDv7/ULID; money none (no payments in scope).
-- Conventional commits: `feat(api): ...`, `fix(web): ...`, `chore: ...`.
-- Shared contracts live in `packages/shared`. Never duplicate a type across apps.
+- Conventional commits: `feat(app): ...`, `fix(db): ...`, `chore(infra): ...`.
+- Shared contracts live in `src/shared` (or shared library directory).
 - Tests live next to code (`*.spec.ts`) or in `test/` for integration/e2e.
 
 ## Multi-agent coordination
@@ -47,11 +47,9 @@ Work lanes (agents may run in parallel in different lanes):
 
 | Lane | Owns | Do not edit without coordination |
 |---|---|---|
-| `infra` | `infra/`, CI, Docker, Terraform | app code |
-| `api` | `apps/api/`, migrations | `apps/web`, `apps/mobile` |
-| `web` | `apps/web/` | `apps/api` |
-| `mobile` | `apps/mobile/` | `apps/api` |
-| `shared` | `packages/*` | changes here need a note in `TASKS.md` because they affect every lane |
+| `app` | `src/` (Next.js app, UI, server actions, route handlers) | `supabase/` |
+| `db` | `supabase/` (migrations, RLS policies, seeds) | `src/` |
+| `infra` | CI, root configs, deployment | `src/`, `supabase/` |
 
 - One task, one branch (`feat/P3-04-ticket-create`), one PR.
 - If you need a change in another lane, add a task for it under "Cross-lane requests" in `TASKS.md` instead of editing it.

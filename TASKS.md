@@ -10,7 +10,7 @@ Lanes: `app` (Next.js) · `db` (Supabase SQL/RLS) · `infra` (CI, config)
 
 ## Phase 0: Re-plan (human approval gate)
 - [x] P0-01 Original plan produced (superseded by ADR-0003)
-- [ ] P0-02 `infra` Revise PLAN.md, ARCHITECTURE.md, AGENTS.md, README, STANDARDS_CHECKLIST (N/A rows) to match ADR-0003; verify free tiers with source URLs (no card); keep each doc short
+- [x] P0-02 `infra` Revise PLAN.md, ARCHITECTURE.md, AGENTS.md, README, STANDARDS_CHECKLIST (N/A rows) to match ADR-0003; verify free tiers with source URLs (no card); keep each doc short
 - [ ] P0-03 Human reviews and says "go"
 
 ## Phase 1: Foundation

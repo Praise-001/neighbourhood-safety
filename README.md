@@ -19,50 +19,42 @@ See [`TASKS.md`](./TASKS.md) for current phase and progress.
 | 7 | [`TASKS.md`](./TASKS.md) | What to do next |
 | Ref | [`docs/MASTER_BRIEF.md`](./docs/MASTER_BRIEF.md) | Original full brief (source of truth if files disagree) |
 
-## Stack
-- **Monorepo:** pnpm + Turborepo, TypeScript everywhere
-- **Web:** Next.js 15 (App Router), Tailwind, shadcn/ui, MapLibre GL
-- **Mobile:** React Native + Expo (EAS Build)
-- **API:** NestJS, REST + OpenAPI, Socket.IO/SSE
-- **Data:** PostgreSQL + PostGIS, Redis, BullMQ, S3-compatible storage
-- **Push:** FCM + APNs
-- **Observability:** Sentry, PostHog, OpenTelemetry, pino
+## Stack (Lean Academic Scope — see docs/adr/0003-zero-cost-student-scope.md)
+- **App:** Next.js 16 (App Router), TypeScript, Tailwind CSS, shadcn/ui, MapLibre GL, installable PWA
+- **Database, Auth & Storage:** Supabase Free Tier (PostgreSQL + PostGIS, Supabase Auth, Storage, Realtime, RLS)
+- **Alerts:** PostGIS spatial queries (`ST_DWithin`), Supabase Realtime, Web Push (VAPID)
+- **Maps & Geocoding:** MapLibre GL + OpenStreetMap / CARTO tiles, Nominatim (with debounce)
+- **Hosting & CI:** Vercel Hobby + GitHub Actions
 
 ## Repo layout
 ```
-apps/
-  web/        Next.js: landing, guest tickets, business portal, moderation
-  mobile/     Expo app
-  api/        NestJS backend + workers
-packages/
-  ui-tokens/  design tokens (web + mobile)
-  shared/     zod schemas, types, constants
-  config/     eslint, tsconfig, prettier
-infra/        docker-compose, terraform, deploy scripts
-docs/         PRD, architecture, ADRs, runbooks, OpenAPI export
+src/
+  app/            Next.js App Router (pages, route handlers, server actions)
+  components/     UI components (shadcn/ui, map, forms)
+  lib/            Supabase client/server helpers, geo utils, validators
+  shared/         Zod schemas, types, error formats
+supabase/
+  migrations/     SQL migrations & RLS policies
+  seeds/          Synthetic demo seed script
+docs/             PRD, ADRs, checklist, plan
 ```
 
-## Quick start (target: under 10 minutes)
+## Quick start (target: under 5 minutes — no Docker needed)
 ```bash
-corepack enable
 pnpm install
-cp .env.example .env            # fill the required values
-docker compose -f infra/docker-compose.yml up -d   # Postgres+PostGIS, Redis, MinIO, Mailpit
-pnpm db:migrate && pnpm db:seed
-pnpm dev                        # api + web
-pnpm --filter mobile start      # Expo
+cp .env.example .env.local       # add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+pnpm dev                         # run Next.js at http://localhost:3000
 ```
 
 ## Common commands
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Run api + web with hot reload |
-| `pnpm lint` / `pnpm typecheck` | Static checks |
+| `pnpm dev` | Run Next.js with hot reload |
+| `pnpm lint` / `pnpm typecheck` | Static code & type checks |
 | `pnpm test` | Unit + integration tests |
-| `pnpm test:e2e` | Playwright (web) |
-| `pnpm db:migrate` | Apply migrations |
-| `pnpm openapi:export` | Write `docs/openapi.json` |
-| `pnpm audit:security` | Dependency + secret scans |
+| `pnpm test:e2e` | Playwright tests |
+| `pnpm db:seed` | Populate synthetic demo data |
+| `pnpm audit:security` | Dependency + secret audit |
 
 ## Contributing
 Read [`docs/WORKFLOW.md`](./docs/WORKFLOW.md). Security issues: see `SECURITY.md`.

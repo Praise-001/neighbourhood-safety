@@ -10,18 +10,18 @@ Legend: Status `☐` todo · `◐` partial · `☑` done · `N/A`. Phase = when 
 | A1 | OTP hashed, single-use, 10 min, 5 attempts, constant-time | 2 | ☐ | | |
 | A2 | No account enumeration (generic responses, timing-safe) | 2 | ☐ | | |
 | A3 | Magic links signed, single-use, short-lived | 2 | ☐ | | |
-| A4 | Password hashing argon2id (if passwords enabled) | 2 | ☐ | | |
+| A4 | Password hashing argon2id (if passwords enabled) | 2 | N/A | out of scope per ADR-0003 | passwordless email OTP only |
 | A5 | Hashing vs encryption decisions in `docs/data-classification.md` | 2 | ☐ | | |
-| A6 | Passkeys (WebAuthn) behind flag | 2 | ☐ | | |
-| A7 | TOTP 2FA + recovery codes (mandatory moderator/admin/business owner+admin) | 2 | ☐ | | |
-| A8 | SSO (OIDC) for businesses behind flag | 5 | ☐ | | |
+| A6 | Passkeys (WebAuthn) behind flag | 2 | N/A | out of scope per ADR-0003 | passkeys out of scope |
+| A7 | TOTP 2FA + recovery codes (mandatory moderator/admin/business owner+admin) | 2 | N/A | out of scope per ADR-0003 | TOTP out of scope |
+| A8 | SSO (OIDC) for businesses behind flag | 5 | N/A | out of scope per ADR-0003 | SSO out of scope |
 | A9 | Account lockout (progressive, anti-DoS) | 2 | ☐ | | |
-| A10 | Session list, remote logout, logout-everywhere | 2 | ☐ | | |
+| A10 | Session list, remote logout, logout-everywhere | 2 | N/A | out of scope per ADR-0003 | standard Supabase Auth session |
 | A11 | Access 15 min + refresh rotation with reuse detection | 2 | ☐ | | |
 | A12 | Cookie flags HttpOnly/Secure/SameSite, `__Host-` prefix | 2 | ☐ | | |
-| A13 | Mobile tokens in Keychain/Keystore | 6 | ☐ | | |
-| A14 | API keys hashed, prefixed, scoped, expirable, revocable | 5 | ☐ | | |
-| A15 | Secret rotation incl. JWT `kid` overlap, runbook tested | 9 | ☐ | | |
+| A13 | Mobile tokens in Keychain/Keystore | 6 | N/A | out of scope per ADR-0003 | native mobile app out of scope (PWA) |
+| A14 | API keys hashed, prefixed, scoped, expirable, revocable | 5 | N/A | out of scope per ADR-0003 | external API keys out of scope |
+| A15 | Secret rotation incl. JWT `kid` overlap, runbook tested | 9 | N/A | out of scope per ADR-0003 | secret rotation runbook out of scope |
 
 ## B. Authorization and data access
 | # | Item | Phase | Status | Where | Test |
@@ -42,15 +42,15 @@ Legend: Status `☐` todo · `◐` partial · `☑` done · `N/A`. Phase = when 
 | C4 | Strict nonce-based CSP + report endpoint | 1/4 | ☐ | | |
 | C5 | Security headers (HSTS, nosniff, Referrer, Permissions-Policy, COOP/CORP) | 1 | ☐ | | |
 | C6 | Clickjacking (`frame-ancestors 'none'`) | 1 | ☐ | | |
-| C7 | SSRF safe-fetch helper (webhooks, URLs) | 5 | ☐ | | |
+| C7 | SSRF safe-fetch helper (webhooks, URLs) | 5 | N/A | out of scope per ADR-0003 | outbound webhooks out of scope |
 | C8 | Open-redirect allow-list (web returnTo, mobile deep links) | 4/7 | ☐ | | |
 | C9 | Path traversal prevention (server-generated keys) | 3 | ☐ | | |
-| C10 | Command injection (execFile args, sandboxed workers) | 3 | ☐ | | |
+| C10 | Command injection (execFile args, sandboxed workers) | 3 | N/A | out of scope per ADR-0003 | no shell exec or worker subprocesses |
 | C11 | File upload security (magic bytes, re-encode, EXIF strip, scan, quarantine, quotas) | 3 | ☐ | | |
-| C12 | Webhooks HMAC + timestamp + replay window + retries + DLQ | 5 | ☐ | | |
+| C12 | Webhooks HMAC + timestamp + replay window + retries + DLQ | 5 | N/A | out of scope per ADR-0003 | outbound webhooks out of scope |
 | C13 | CORS allow-list | 1 | ☐ | | |
 | C14 | Dependency vulnerabilities: audit, Dependabot/Renovate, Trivy, SBOM | 1+ | ☐ | | |
-| C15 | Penetration testing: ZAP in CI, checklist, independent test before launch | 9 | ☐ | | |
+| C15 | Penetration testing: ZAP in CI, checklist, independent test before launch | 9 | N/A | out of scope per ADR-0003 | external pentest out of scope |
 
 ## D. Data layer
 | # | Item | Phase | Status | Where | Test |
@@ -58,12 +58,12 @@ Legend: Status `☐` todo · `◐` partial · `☑` done · `N/A`. Phase = when 
 | D1 | Indexing verified with EXPLAIN ANALYZE | 3+ | ☐ | | |
 | D2 | Normalization (3NF; documented denormalizations) | 1+ | ☐ | | |
 | D3 | Migrations: versioned, CI-checked, expand/contract, never edited | 1+ | ☐ | | |
-| D4 | Soft deletes + hard purge job | 3/8 | ☐ | | |
+| D4 | Soft deletes + hard purge job | 3/8 | N/A | out of scope per ADR-0003 | direct user deletion flow in P7-04 |
 | D5 | Race conditions: locks, atomic counters, optimistic locking, concurrency tests | 3 | ☐ | | |
-| D6 | Connection pooling (PgBouncer) | 9 | ☐ | | |
-| D7 | Read replicas + lag handling | 9 | ☐ | | |
-| D8 | Backups + PITR + restore drill, RPO ≤ 5 min, RTO ≤ 1 h | 9 | ☐ | | |
-| D9 | Encryption at rest (DB, storage, backups, Redis) | 9 | ☐ | | |
+| D6 | Connection pooling (PgBouncer) | 9 | N/A | out of scope per ADR-0003 | managed by Supabase pooler |
+| D7 | Read replicas + lag handling | 9 | N/A | out of scope per ADR-0003 | read replicas out of scope |
+| D8 | Backups + PITR + restore drill, RPO ≤ 5 min, RTO ≤ 1 h | 9 | N/A | out of scope per ADR-0003 | disaster recovery drills out of scope |
+| D9 | Encryption at rest (DB, storage, backups, Redis) | 9 | N/A | out of scope per ADR-0003 | Redis out of scope; Supabase disk encryption |
 | D10 | Encryption in transit (TLS 1.2+, internal) + HSTS | 9 | ☐ | | |
 | D11 | Time zones: UTC storage, IANA quiet hours, tests | 6/7 | ☐ | | |
 | D12 | Character encoding: UTF-8, NFC, control/bidi rejection | 3 | ☐ | | |
@@ -75,13 +75,13 @@ Legend: Status `☐` todo · `◐` partial · `☑` done · `N/A`. Phase = when 
 | E1 | Timeouts on every outbound call, DB statement_timeout | 1+ | ☐ | | |
 | E2 | Exponential backoff with jitter, retryable errors only | 3/7 | ☐ | | |
 | E3 | Idempotency keys on all create endpoints | 3 | ☐ | | |
-| E4 | Circuit breakers (SMS, email, push, moderation, geocoding) | 7 | ☐ | | |
-| E5 | Queues: priorities, DLQ, stalled jobs, backlog alerts | 3/7 | ☐ | | |
+| E4 | Circuit breakers (SMS, email, push, moderation, geocoding) | 7 | N/A | out of scope per ADR-0003 | SMS and third-party circuit breakers out of scope |
+| E5 | Queues: priorities, DLQ, stalled jobs, backlog alerts | 3/7 | N/A | out of scope per ADR-0003 | BullMQ / Redis queues out of scope |
 | E6 | Background/cron jobs single-run, idempotent, monitored | 3 | ☐ | | |
 | E7 | Stateless services | 1 | ☐ | | |
-| E8 | Health checks live + ready | 1 | ☐ | | |
-| E9 | Graceful shutdown (HTTP, WS, jobs, pools) | 9 | ☐ | | |
-| E10 | Horizontal scaling plan documented | 9 | ☐ | | |
+| E8 | Health checks live + ready | 1 | N/A | out of scope per ADR-0003 | serverless hosting on Vercel |
+| E9 | Graceful shutdown (HTTP, WS, jobs, pools) | 9 | N/A | out of scope per ADR-0003 | serverless lifecycle |
+| E10 | Horizontal scaling plan documented | 9 | N/A | out of scope per ADR-0003 | academic prototype scope |
 | E11 | Memory leaks/async: no floating promises, handlers, soak test | 9 | ☐ | | |
 | E12 | Error handling RFC 7807, stable codes, request ID | 1 | ☐ | | |
 | E13 | HTTP status codes correct and documented | 1+ | ☐ | | |
@@ -89,38 +89,38 @@ Legend: Status `☐` todo · `◐` partial · `☑` done · `N/A`. Phase = when 
 ## F. Performance and edge
 | # | Item | Phase | Status | Where | Test |
 |---|---|---|---|---|---|
-| F1 | Load balancer + reverse proxy | 9 | ☐ | | |
-| F2 | API gateway/WAF | 9 | ☐ | | |
+| F1 | Load balancer + reverse proxy | 9 | N/A | out of scope per ADR-0003 | managed by Vercel Edge Network |
+| F2 | API gateway/WAF | 9 | N/A | out of scope per ADR-0003 | WAF out of scope |
 | F3 | Layered rate limiting | 1/8 | ☐ | | |
-| F4 | Caching + invalidation + stampede protection | 3 | ☐ | | |
-| F5 | CDN for media/tiles/assets | 9 | ☐ | | |
-| F6 | Performance budgets enforced in CI | 4 | ☐ | | |
-| F7 | Load testing (k6) published in `docs/perf/` | 7/9 | ☐ | | |
-| F8 | Profiling/debugging runbook | 9 | ☐ | | |
+| F4 | Caching + invalidation + stampede protection | 3 | N/A | out of scope per ADR-0003 | Redis cache out of scope |
+| F5 | CDN for media/tiles/assets | 9 | N/A | out of scope per ADR-0003 | CDN infrastructure out of scope |
+| F6 | Performance budgets enforced in CI | 4 | N/A | out of scope per ADR-0003 | Lighthouse CI budgets out of scope |
+| F7 | Load testing (k6) published in `docs/perf/` | 7/9 | N/A | out of scope per ADR-0003 | k6 load tests out of scope |
+| F8 | Profiling/debugging runbook | 9 | N/A | out of scope per ADR-0003 | profiling runbooks out of scope |
 
 ## G. Observability and operations
 | # | Item | Phase | Status | Where | Test |
 |---|---|---|---|---|---|
 | G1 | Structured logging with redaction | 1 | ☐ | | |
-| G2 | Monitoring + alerting with runbook links | 7/9 | ☐ | | |
-| G3 | Distributed tracing (OpenTelemetry) | 9 | ☐ | | |
-| G4 | Error tracking (Sentry) api/web/mobile | 1 | ☐ | | |
-| G5 | Uptime monitoring + canary + status page | 9 | ☐ | | |
-| G6 | Cost monitoring + SMS pumping protection | 8/9 | ☐ | | |
+| G2 | Monitoring + alerting with runbook links | 7/9 | N/A | out of scope per ADR-0003 | production monitoring out of scope |
+| G3 | Distributed tracing (OpenTelemetry) | 9 | N/A | out of scope per ADR-0003 | OpenTelemetry out of scope |
+| G4 | Error tracking (Sentry) api/web/mobile | 1 | N/A | out of scope per ADR-0003 | Sentry out of scope |
+| G5 | Uptime monitoring + canary + status page | 9 | N/A | out of scope per ADR-0003 | uptime status page out of scope |
+| G6 | Cost monitoring + SMS pumping protection | 8/9 | N/A | out of scope per ADR-0003 | SMS and telephony out of scope |
 
 ## H. Delivery and process
 | # | Item | Phase | Status | Where | Test |
 |---|---|---|---|---|---|
 | H1 | Env var validation at boot, `.env.example` | 1 | ☐ | | |
 | H2 | Secrets manager + gitleaks | 1/9 | ☐ | | |
-| H3 | Docker hardened (multi-stage, non-root, scanned) | 1/9 | ☐ | | |
-| H4 | CI/CD with gates, staged deploy, rollback | 1/9 | ☐ | | |
-| H5 | Staging environment (synthetic data) | 9 | ☐ | | |
-| H6 | Infrastructure as Code | 9 | ☐ | | |
-| H7 | Feature flags + kill switches | 2/7 | ☐ | | |
+| H3 | Docker hardened (multi-stage, non-root, scanned) | 1/9 | N/A | out of scope per ADR-0003 | Docker out of scope |
+| H4 | CI/CD with gates, staged deploy, rollback | 1/9 | N/A | out of scope per ADR-0003 | blue/green staged rollback out of scope |
+| H5 | Staging environment (synthetic data) | 9 | N/A | out of scope per ADR-0003 | single demo deployment |
+| H6 | Infrastructure as Code | 9 | N/A | out of scope per ADR-0003 | Terraform out of scope |
+| H7 | Feature flags + kill switches | 2/7 | N/A | out of scope per ADR-0003 | feature flags out of scope |
 | H8 | Code review, CODEOWNERS, branch protection | 1 | ☐ | | |
-| H9 | SemVer + changelog; API versioning + deprecation policy | 1/9 | ☐ | | |
-| H10 | API documentation (OpenAPI in CI) | 1+ | ☐ | | |
+| H9 | SemVer + changelog; API versioning + deprecation policy | 1/9 | N/A | out of scope per ADR-0003 | single academic prototype app |
+| H10 | API documentation (OpenAPI in CI) | 1+ | N/A | out of scope per ADR-0003 | single Next.js app with server actions & route handlers |
 | H11 | Test pyramid: unit / integration / e2e | 1+ | ☐ | | |
 | H12 | Technical debt register + ADRs | 1+ | ☐ | | |
 
@@ -138,10 +138,10 @@ Legend: Status `☐` todo · `◐` partial · `☑` done · `N/A`. Phase = when 
 | J3 | Rate limits | 2/8 | ☐ | |
 | J4 | OTP brute force | 2 | ☐ | |
 | J5 | Upload abuse | 3 | ☐ | |
-| J6 | SSRF | 5 | ☐ | |
+| J6 | SSRF | 5 | N/A | out of scope per ADR-0003: webhooks out of scope |
 | J7 | Open redirect | 4 | ☐ | |
 | J8 | XSS payloads in comments | 3/4 | ☐ | |
 | J9 | Parallel/duplicate submission | 3 | ☐ | |
-| J10 | Refresh-token reuse | 2 | ☐ | |
+| J10 | Refresh-token reuse | 2 | N/A | out of scope per ADR-0003: handled by Supabase Auth |
 | J11 | Cross-tenant access (business) | 5 | ☐ | |
 | J12 | Anonymous report de-anonymisation (public payloads, timing, joins) | 3 | ☐ | |
