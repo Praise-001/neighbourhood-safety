@@ -93,11 +93,21 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## Free-Tier Operation & Demo Note
+
+> [!IMPORTANT]
+> **Supabase Free Projects Inactivity Pausing:** Supabase free-tier database instances pause automatically after prolonged inactivity. Before giving an academic presentation or evaluator demonstration, make a request to the live URL (`https://neighbourhood-safety-app.vercel.app/`) or open the Supabase dashboard 2 minutes prior to ensure the instance is active and warm.
+
+---
+
 ## Running Verification & Tests
 
 ```bash
-# Run unit & live Row-Level Security tests (18 tests)
+# Run unit & live Row-Level Security tests (19 tests)
 pnpm test
+
+# Run privacy & security proof assertions (F8)
+pnpm run proof
 
 # Run TypeScript strict typecheck
 pnpm run typecheck
@@ -105,6 +115,8 @@ pnpm run typecheck
 # Run production build
 pnpm run build
 ```
+
+See [`docs/DEMO.md`](./docs/DEMO.md) for the complete step-by-step demonstration rehearsal script.
 
 ---
 
