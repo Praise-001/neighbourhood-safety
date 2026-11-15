@@ -19,12 +19,12 @@ Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. E
 - [x] S1-04 Seed script with about 30 synthetic incidents around one city.
 
 ## Block 2: Core reporting (120 min)
-- [ ] S2-01 Report form with zod validation: all fields, severity, time, anonymous toggle, email for no-account reports.
-- [ ] S2-02 Location picker: GPS button plus draggable pin on a MapLibre map; address search only on button press (no as-you-type), max one request per second, descriptive User-Agent.
-- [ ] S2-03 Public coordinate rounding for sensitive categories (with unit tests).
-- [ ] S2-04 Photo upload: re-encode in the browser to strip location data, limit type and size, store in Supabase Storage.
-- [ ] S2-05 Reference code generator and success screen showing the code; simple public page where entering a code shows that ticket.
-- [ ] S2-06 Simple abuse limit on report creation.
+- [x] S2-01 Report form with zod validation: all fields, severity, time, anonymous toggle, email for no-account reports.
+- [x] S2-02 Location picker: GPS button plus draggable pin on a MapLibre map; address search only on button press (no as-you-type), max one request per second, descriptive User-Agent.
+- [x] S2-03 Public coordinate rounding for sensitive categories (with unit tests).
+- [x] S2-04 Photo upload: re-encode in the browser to strip location data, limit type and size, store in Supabase Storage.
+- [x] S2-05 Reference code generator and success screen showing the code; simple public page where entering a code shows that ticket.
+- [x] S2-06 Simple abuse limit on report creation.
 
 ## Block 3: Map and detail (120 min)
 - [ ] S3-01 Map page with markers, clustering, and filters by category and time range.
