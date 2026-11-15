@@ -6,7 +6,7 @@ Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. E
 - [x] S0-01 Create the Next.js app in the repo root (TypeScript, Tailwind, App Router) with pnpm.
 - [x] S0-02 Theme: navy, yellow, white tokens; light and dark with a toggle; disclaimer banner.
 - [x] S0-03 **Owner action:** create the free Supabase project (agent gives exact steps); enable `postgis`; put the URL and anon key in `.env.local`; add `.env.example`.
-- [ ] S0-04 Basic security headers in `next.config`.
+- [x] S0-04 Basic security headers in `next.config`.
 
 ## Block 1: Database (60 min)
 - [ ] S1-01 SQL migration (see ADR-0004 "Data shape rule"):
