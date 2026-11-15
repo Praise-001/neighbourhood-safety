@@ -63,12 +63,30 @@ export default function RootLayout({
               </span>
             </Link>
 
-            <nav className="flex items-center gap-3 sm:gap-4">
+            <nav className="flex items-center gap-2 sm:gap-4">
+              <Link
+                href="/map"
+                className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+              >
+                Live Map
+              </Link>
+              <Link
+                href="/alerts"
+                className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+              >
+                Alerts
+              </Link>
+              <Link
+                href="/status"
+                className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+              >
+                Lookup
+              </Link>
               <Link
                 href="/report"
                 className="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-md bg-yellow text-slate-950 hover:bg-yellow-hover transition-colors shadow-sm"
               >
-                + Report Incident
+                + Report
               </Link>
               <ThemeToggle />
             </nav>

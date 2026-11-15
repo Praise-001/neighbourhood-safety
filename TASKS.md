@@ -27,10 +27,10 @@ Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. E
 - [x] S2-06 Simple abuse limit on report creation.
 
 ## Block 3: Map and detail (120 min)
-- [ ] S3-01 Map page with markers, clustering, and filters by category and time range.
-- [ ] S3-02 Feed list view of the same data, newest first, with distance when location is known.
-- [ ] S3-03 Ticket detail page: info, photo, timeline, comments, "I see this too" button (one per user, atomic).
-- [ ] S3-04 *(optional)* Email magic-link sign-in; signed-in users get their reports linked to them.
+- [x] S3-01 Map page with markers, clustering, and filters by category and time range.
+- [x] S3-02 Feed list view of the same data, newest first, with distance when location is known.
+- [x] S3-03 Ticket detail page: info, photo, timeline, comments, "I see this too" button (one per user, atomic).
+- [x] S3-04 *(optional)* Email magic-link sign-in; signed-in users get their reports linked to them.
 
 ## Block 4: Alerts (60 min)
 - [ ] S4-01 Alert settings page: set home on the map, choose radius.
