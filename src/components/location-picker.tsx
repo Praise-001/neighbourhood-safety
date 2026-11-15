@@ -143,8 +143,8 @@ export function LocationPicker({
   };
 
   // Address search on button press only (S2-02)
-  const handleAddressSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddressSearch = async (e?: React.FormEvent | React.SyntheticEvent) => {
+    e?.preventDefault();
     if (!searchQuery.trim() || searchQuery.trim().length < 3) {
       setSearchError("Please enter at least 3 characters to search.");
       return;
@@ -221,25 +221,32 @@ export function LocationPicker({
         <p className="text-xs text-yellow font-medium">{locationStatus}</p>
       )}
 
-      {/* Address Search on Button Press Only */}
-      <form onSubmit={handleAddressSearch} className="flex gap-2">
+      {/* Address Search on Button Press Only (div container to prevent nested form invalid HTML) */}
+      <div className="flex gap-2">
         <div className="relative flex-1">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddressSearch(e);
+              }
+            }}
             placeholder="Search address, street name, or postcode..."
             className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow shadow-2xs"
           />
         </div>
         <button
-          type="submit"
+          type="button"
+          onClick={handleAddressSearch}
           disabled={isSearching}
           className="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-yellow text-slate-950 hover:bg-yellow-hover disabled:opacity-50 transition-colors shadow-2xs whitespace-nowrap"
         >
           {isSearching ? "Searching..." : "Find"}
         </button>
-      </form>
+      </div>
 
       {searchError && (
         <p className="text-xs text-red-500 font-medium">{searchError}</p>
