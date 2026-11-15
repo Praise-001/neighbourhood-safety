@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import Link from "next/link";
 import * as maplibregl from "maplibre-gl";
 import { Ticket, CATEGORIES, SEVERITIES } from "@/lib/types";
-import { OSM_RASTER_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM, MAP_ATTRIBUTION } from "@/lib/map-style";
+import { DEFAULT_CENTER, DEFAULT_ZOOM, createMapInstance } from "@/lib/map-style";
 import { calculateDistanceMeters, formatDistance } from "@/lib/geo";
 
 export default function MapAndFeedPage() {
@@ -108,12 +108,10 @@ export default function MapAndFeedPage() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = new maplibregl.Map({
+    const map = createMapInstance({
       container: mapContainerRef.current,
-      style: OSM_RASTER_STYLE,
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
-      attributionControl: { customAttribution: MAP_ATTRIBUTION },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
@@ -255,7 +253,7 @@ export default function MapAndFeedPage() {
   }, [geojson]);
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden min-h-0 min-w-0">
       {/* Top Filter Bar */}
       <div className="border-b border-border bg-card/95 backdrop-blur-md px-4 py-3 shadow-xs z-10 flex flex-wrap items-center justify-between gap-3">
         {/* Category Pills */}
@@ -334,14 +332,14 @@ export default function MapAndFeedPage() {
       )}
 
       {/* Main Dual Pane Canvas */}
-      <div className="flex-1 relative flex overflow-hidden">
+      <div className="flex-1 relative flex overflow-hidden min-h-0 min-w-0">
         {/* Map View */}
         <div
-          className={`flex-1 relative ${
+          className={`flex-1 relative h-full min-h-0 min-w-0 overflow-hidden ${
             viewMode === "map" ? "block" : "hidden sm:block sm:w-1/2 lg:w-3/5"
           }`}
         >
-          <div ref={mapContainerRef} className="w-full h-full" />
+          <div ref={mapContainerRef} className="absolute inset-0 w-full h-full min-h-0 min-w-0" />
 
           {/* Map Legend */}
           <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-border shadow-lg text-xs space-y-1.5 z-10">

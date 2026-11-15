@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, use } from "react";
 import Link from "next/link";
 import * as maplibregl from "maplibre-gl";
 import { Ticket, TicketUpdate, Comment, CATEGORIES, SEVERITIES } from "@/lib/types";
-import { OSM_RASTER_STYLE, MAP_ATTRIBUTION } from "@/lib/map-style";
+import { createMapInstance } from "@/lib/map-style";
 import { getOrCreateClientToken } from "@/lib/client-token";
 
 interface PageProps {
@@ -75,13 +75,11 @@ export default function TicketDetailPage({ params }: PageProps) {
   useEffect(() => {
     if (!ticket || !mapContainerRef.current || mapRef.current) return;
 
-    const map = new maplibregl.Map({
+    const map = createMapInstance({
       container: mapContainerRef.current,
-      style: OSM_RASTER_STYLE,
       center: [ticket.public_lng, ticket.public_lat],
       zoom: 14,
       interactive: true,
-      attributionControl: { customAttribution: MAP_ATTRIBUTION },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
@@ -456,8 +454,8 @@ export default function TicketDetailPage({ params }: PageProps) {
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Location & Pin
               </h3>
-              <div className="rounded-xl overflow-hidden border border-border h-48 relative shadow-inner">
-                <div ref={mapContainerRef} className="w-full h-full" />
+              <div className="rounded-xl overflow-hidden border border-border h-48 min-h-[12rem] max-h-[12rem] relative shadow-inner">
+                <div ref={mapContainerRef} className="absolute inset-0 w-full h-full min-h-0 min-w-0" />
                 <div className="absolute bottom-2 left-2 bg-card/90 px-2 py-0.5 rounded text-[10px] font-bold border border-border">
                   📍 Public Location
                 </div>

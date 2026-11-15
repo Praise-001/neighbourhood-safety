@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
-import { OSM_RASTER_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM, MAP_ATTRIBUTION } from "@/lib/map-style";
+import { DEFAULT_CENTER, DEFAULT_ZOOM, createMapInstance } from "@/lib/map-style";
 import { getOrCreateClientToken } from "@/lib/client-token";
 
 export default function AlertSettingsPage() {
@@ -76,12 +76,10 @@ export default function AlertSettingsPage() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = new maplibregl.Map({
+    const map = createMapInstance({
       container: mapContainerRef.current,
-      style: OSM_RASTER_STYLE,
       center: [homeLng, homeLat],
       zoom: DEFAULT_ZOOM,
-      attributionControl: { customAttribution: MAP_ATTRIBUTION },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
@@ -327,8 +325,8 @@ export default function AlertSettingsPage() {
         </div>
 
         {/* Interactive Map */}
-        <div className="rounded-xl overflow-hidden border border-border h-72 sm:h-80 relative shadow-inner">
-          <div ref={mapContainerRef} className="w-full h-full" />
+        <div className="rounded-xl overflow-hidden border border-border h-72 sm:h-80 min-h-[18rem] max-h-[20rem] relative shadow-inner">
+          <div ref={mapContainerRef} className="absolute inset-0 w-full h-full min-h-0 min-w-0" />
           <div className="absolute bottom-2.5 left-2.5 bg-card/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-semibold border border-border shadow-sm text-foreground">
             Perimeter: <strong>{radiusMeters < 1000 ? `${radiusMeters} m` : `${radiusMeters / 1000} km`}</strong> radius
           </div>

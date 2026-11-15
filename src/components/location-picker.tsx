@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
-import { OSM_RASTER_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM, MAP_ATTRIBUTION } from "@/lib/map-style";
+import { DEFAULT_CENTER, DEFAULT_ZOOM, createMapInstance } from "@/lib/map-style";
 
 interface LocationPickerProps {
   lat: number;
@@ -41,12 +41,10 @@ export function LocationPicker({
     const initialCenter: [number, number] =
       lng && lat ? [lng, lat] : DEFAULT_CENTER;
 
-    const map = new maplibregl.Map({
+    const map = createMapInstance({
       container: mapContainerRef.current,
-      style: OSM_RASTER_STYLE,
       center: initialCenter,
       zoom: DEFAULT_ZOOM,
-      attributionControl: { customAttribution: MAP_ATTRIBUTION },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
@@ -253,10 +251,10 @@ export function LocationPicker({
       )}
 
       {/* Draggable Map Canvas */}
-      <div className="relative rounded-xl overflow-hidden border border-border shadow-inner">
+      <div className="relative rounded-xl overflow-hidden border border-border shadow-inner w-full h-64 sm:h-72 min-h-[16rem] max-h-[18rem]">
         <div
           ref={mapContainerRef}
-          className="w-full h-64 sm:h-72 bg-slate-200 dark:bg-slate-900"
+          className="absolute inset-0 w-full h-full min-h-0 min-w-0 bg-slate-200 dark:bg-slate-900"
         />
         <div className="absolute bottom-2.5 left-2.5 bg-card/90 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-semibold border border-border shadow-sm text-foreground flex items-center gap-1.5">
           <span>🎯</span>
