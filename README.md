@@ -39,14 +39,20 @@ Built on a **zero-cost architecture** with synthetic data for academic evaluatio
 
 - **Framework:** Next.js 16 (App Router, Turbopack, Server-side API routes)
 - **Styling & Theming:** Tailwind CSS v4, custom tokens (deep navy `#0B192C`, amber yellow `#F59E0B`, white `#FFFFFF`), with dark/light mode toggle
-- **Maps:** MapLibre GL 6 with OpenStreetMap raster tiles (no API keys, zero cost)
+- **Maps:** MapLibre GL 6 with OpenFreeMap vector tiles (`liberty` style, zero cost, no card or API key required, verified Nov 15, 2026; terms: [openfreemap.org](https://openfreemap.org))
 - **Geocoding:** OpenStreetMap Nominatim with server-side rate-limiting (max 1 req/sec) and custom descriptive User-Agent
 - **Database & Storage:** Supabase Free Tier (PostgreSQL with PostGIS extension, Row-Level Security, Storage, Realtime)
 - **Validation & Testing:** Zod 4 for strict runtime validation, Vitest 5 for unit and security RLS testing
 
 ---
 
-## Getting Started
+## Map Provider & Attribution
+
+- **Provider:** OpenFreeMap (`https://tiles.openfreemap.org/styles/liberty`)
+- **Terms & Usage:** [openfreemap.org](https://openfreemap.org) — completely free, open-source, no API keys, no rate limits, zero credit card requirement. Checked & verified on 2026-11-15.
+- **Attribution Display:** Displayed on all map instances via MapLibre GL attribution control: `OpenFreeMap © OpenStreetMap contributors`.
+
+---
 
 ### Prerequisites
 - Node.js `v20+` (tested on Node `v24.22.1`)

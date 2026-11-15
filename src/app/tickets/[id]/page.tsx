@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, use } from "react";
 import Link from "next/link";
 import * as maplibregl from "maplibre-gl";
 import { Ticket, TicketUpdate, Comment, CATEGORIES, SEVERITIES } from "@/lib/types";
-import { OSM_RASTER_STYLE } from "@/lib/map-style";
+import { OSM_RASTER_STYLE, MAP_ATTRIBUTION } from "@/lib/map-style";
 import { getOrCreateClientToken } from "@/lib/client-token";
 
 interface PageProps {
@@ -81,6 +81,7 @@ export default function TicketDetailPage({ params }: PageProps) {
       center: [ticket.public_lng, ticket.public_lat],
       zoom: 14,
       interactive: true,
+      attributionControl: { customAttribution: MAP_ATTRIBUTION },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");

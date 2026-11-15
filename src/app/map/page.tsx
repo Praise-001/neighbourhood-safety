@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import Link from "next/link";
 import * as maplibregl from "maplibre-gl";
 import { Ticket, CATEGORIES, SEVERITIES } from "@/lib/types";
-import { OSM_RASTER_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/map-style";
+import { OSM_RASTER_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM, MAP_ATTRIBUTION } from "@/lib/map-style";
 import { calculateDistanceMeters, formatDistance } from "@/lib/geo";
 
 export default function MapAndFeedPage() {
@@ -113,6 +113,7 @@ export default function MapAndFeedPage() {
       style: OSM_RASTER_STYLE,
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
+      attributionControl: { customAttribution: MAP_ATTRIBUTION },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
-import { OSM_RASTER_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/map-style";
+import { OSM_RASTER_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM, MAP_ATTRIBUTION } from "@/lib/map-style";
 
 interface LocationPickerProps {
   lat: number;
@@ -46,6 +46,7 @@ export function LocationPicker({
       style: OSM_RASTER_STYLE,
       center: initialCenter,
       zoom: DEFAULT_ZOOM,
+      attributionControl: { customAttribution: MAP_ATTRIBUTION },
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
