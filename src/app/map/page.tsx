@@ -117,6 +117,8 @@ export default function MapAndFeedPage() {
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
     map.on("load", () => {
+      map.resize();
+
       // Add clustered GeoJSON source
       map.addSource("incidents", {
         type: "geojson",
@@ -235,13 +237,31 @@ export default function MapAndFeedPage() {
       });
     });
 
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize();
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     mapRef.current = map;
 
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
     };
   }, []);
+
+  // Ensure map resizes when switching view modes
+  useEffect(() => {
+    if (mapRef.current) {
+      const t = setTimeout(() => {
+        mapRef.current?.resize();
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [viewMode]);
 
   // Update source
   useEffect(() => {
@@ -253,7 +273,7 @@ export default function MapAndFeedPage() {
   }, [geojson]);
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden min-h-0 min-w-0">
+    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] min-h-[500px] overflow-hidden">
       {/* Top Filter Bar */}
       <div className="border-b border-border bg-card/95 backdrop-blur-md px-4 py-3 shadow-xs z-10 flex flex-wrap items-center justify-between gap-3">
         {/* Category Pills */}
@@ -332,14 +352,19 @@ export default function MapAndFeedPage() {
       )}
 
       {/* Main Dual Pane Canvas */}
-      <div className="flex-1 relative flex overflow-hidden min-h-0 min-w-0">
+      <div className="flex-1 relative flex flex-col sm:flex-row w-full h-[calc(100vh-8.5rem)] min-h-[450px] overflow-hidden">
         {/* Map View */}
         <div
-          className={`flex-1 relative h-full min-h-0 min-w-0 overflow-hidden ${
-            viewMode === "map" ? "block" : "hidden sm:block sm:w-1/2 lg:w-3/5"
+          className={`relative h-full overflow-hidden ${
+            viewMode === "map" ? "flex-1 w-full" : "hidden sm:flex-1 sm:block sm:w-1/2 lg:w-3/5"
           }`}
+          style={{ minHeight: "450px" }}
         >
-          <div ref={mapContainerRef} className="absolute inset-0 w-full h-full min-h-0 min-w-0" />
+          <div
+            ref={mapContainerRef}
+            className="w-full h-full min-h-[450px]"
+            style={{ width: "100%", height: "100%", minHeight: "450px" }}
+          />
 
           {/* Map Legend */}
           <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-border shadow-lg text-xs space-y-1.5 z-10">

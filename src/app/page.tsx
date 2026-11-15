@@ -34,7 +34,7 @@ export default async function Home() {
           {/* Live Status Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-yellow/15 text-yellow border border-yellow/30 shadow-sm animate-fade-in">
             <span className="w-2 h-2 rounded-full bg-yellow animate-ping" />
-            <span>Live Community Incident Grid · Manchester Demo Active</span>
+            <span>Live Community Incident Grid · Lagos Demo Active</span>
           </div>
 
           {/* Headline */}

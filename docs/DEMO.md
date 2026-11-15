@@ -19,22 +19,22 @@
 
 ### Step 1: Perimeter Alerts Setup (Window B)
 1. In **Window B**, navigate to `/alerts`.
-2. Observe the interactive OpenFreeMap map showing Manchester, UK.
-3. Drag the marker pin to Manchester Piccadilly (`-2.2309, 53.4774`) and select a **1 km** alert radius.
-4. Click **"Save Alert Preferences"**. Notice the confirmation toast ("Alert radius saved locally"). Window B is now listening via Supabase Realtime for any new incident within 1 km.
+2. Observe the interactive OpenFreeMap map showing Lagos, Nigeria.
+3. Drag the marker pin to Victoria Island / Lekki (`3.4280, 6.4320`) and select a **2 km** alert radius.
+4. Click **"Save Alert Preferences"**. Notice the confirmation toast ("Alert radius saved locally"). Window B is now listening via Supabase Realtime for any new incident within 2 km.
 
 ### Step 2: Instant Anonymous Incident Report (Window A)
 1. In **Window A**, click **"+ Report"** in the top navbar (`/report`).
 2. Fill out an incident without creating an account:
    - **Category:** `road_hazard` or `vandalism`
    - **Severity:** `medium`
-   - **Title:** "Broken Glass and Debris Near Station Approach"
-   - **Description:** "Large amount of broken bottles scattered across the cycle lane."
-   - **Location:** Drag the pin marker near Manchester Piccadilly (within 1 km of Window B's pin).
+   - **Title:** "Broken Glass and Debris Near Junction"
+   - **Description:** "Large amount of broken glass bottles scattered across the lane."
+   - **Location:** Drag the pin marker near Adeola Odeku St, Victoria Island (within 2 km of Window B's pin).
    - **Privacy toggle:** Leave "Report anonymously" checked (or provide an email).
    - **Photo:** (Optional) Attach any JPEG/PNG file. Note that EXIF/GPS metadata is stripped in-browser before upload.
 3. Click **"Submit Incident Report"**.
-4. Observe the immediate success page showing your unique Reference Code (e.g., `MCR-4821`).
+4. Observe the immediate success page showing your unique Reference Code (e.g., `LOS-4821`).
 
 ### Step 3: Realtime In-App Notification (Window B)
 1. Look at **Window B** immediately after submitting in Window A.
@@ -71,5 +71,5 @@
 In adherence to academic integrity and the sprint scope defined in `docs/adr/0004-sprint-scope.md`:
 1. **Web Push Background Notifications:** Browser push notifications via Service Workers were cut from sprint scope due to Safari/iOS VAPID requirements; notifications are delivered via realtime in-app perimeter banners.
 2. **Reverse Geocoding Rate Limits:** Address search uses OpenStreetMap Nominatim with a 1 req/sec server-side bottleneck to comply strictly with the free tier usage policy.
-3. **Synthetic Baseline:** All 30 seeded incidents are synthetic simulations centered around Manchester, UK, generated for academic testing.
+3. **Synthetic Baseline:** All 30 seeded incidents are synthetic simulations centered around Lagos, Nigeria, generated for academic testing.
 4. **Free Tier Pausing:** Supabase free databases spin down after prolonged inactivity; warm-up is required before initial live demonstrations.

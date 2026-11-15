@@ -73,10 +73,22 @@ export function LocationPicker({
       });
     });
 
+    map.on("load", () => {
+      map.resize();
+    });
+
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize();
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     mapRef.current = map;
     markerRef.current = marker;
 
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
@@ -251,10 +263,11 @@ export function LocationPicker({
       )}
 
       {/* Draggable Map Canvas */}
-      <div className="relative rounded-xl overflow-hidden border border-border shadow-inner w-full h-64 sm:h-72 min-h-[16rem] max-h-[18rem]">
+      <div className="relative rounded-xl overflow-hidden border border-border shadow-inner w-full h-72 sm:h-80 min-h-[18rem] max-h-[22rem]">
         <div
           ref={mapContainerRef}
-          className="absolute inset-0 w-full h-full min-h-0 min-w-0 bg-slate-200 dark:bg-slate-900"
+          className="w-full h-full min-h-[18rem] bg-slate-200 dark:bg-slate-900"
+          style={{ width: "100%", height: "100%", minHeight: "18rem" }}
         />
         <div className="absolute bottom-2.5 left-2.5 bg-card/90 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-semibold border border-border shadow-sm text-foreground flex items-center gap-1.5">
           <span>🎯</span>

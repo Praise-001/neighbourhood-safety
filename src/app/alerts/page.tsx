@@ -104,6 +104,7 @@ export default function AlertSettingsPage() {
     });
 
     map.on("load", () => {
+      map.resize();
       const circleData = createGeoJSONCircle([homeLng, homeLat], radiusMeters);
 
       map.addSource("radius-circle", {
@@ -133,10 +134,18 @@ export default function AlertSettingsPage() {
       });
     });
 
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize();
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     mapRef.current = map;
     markerRef.current = marker;
 
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
@@ -325,8 +334,12 @@ export default function AlertSettingsPage() {
         </div>
 
         {/* Interactive Map */}
-        <div className="rounded-xl overflow-hidden border border-border h-72 sm:h-80 min-h-[18rem] max-h-[20rem] relative shadow-inner">
-          <div ref={mapContainerRef} className="absolute inset-0 w-full h-full min-h-0 min-w-0" />
+        <div className="rounded-xl overflow-hidden border border-border h-72 sm:h-80 min-h-[18rem] max-h-[22rem] relative shadow-inner w-full">
+          <div
+            ref={mapContainerRef}
+            className="w-full h-full min-h-[18rem]"
+            style={{ width: "100%", height: "100%", minHeight: "18rem" }}
+          />
           <div className="absolute bottom-2.5 left-2.5 bg-card/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-semibold border border-border shadow-sm text-foreground">
             Perimeter: <strong>{radiusMeters < 1000 ? `${radiusMeters} m` : `${radiusMeters / 1000} km`}</strong> radius
           </div>

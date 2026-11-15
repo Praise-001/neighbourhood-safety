@@ -8,7 +8,9 @@ export const OSM_RASTER_STYLE = DEFAULT_MAP_STYLE;
 export const MAP_ATTRIBUTION =
   '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
 
-export const DEFAULT_CENTER: [number, number] = [-2.2426, 53.4808]; // Manchester, UK
+// Default center: Lagos, Nigeria (Yaba / Lagos Mainland / Island)
+export const DEFAULT_CITY = "Lagos, Nigeria";
+export const DEFAULT_CENTER: [number, number] = [3.3792, 6.5244];
 export const DEFAULT_ZOOM = 13;
 
 /**

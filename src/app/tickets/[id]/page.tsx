@@ -82,6 +82,10 @@ export default function TicketDetailPage({ params }: PageProps) {
       interactive: true,
     });
 
+    map.on("load", () => {
+      map.resize();
+    });
+
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
     new maplibregl.Marker({ color: "#f59e0b" })
@@ -90,7 +94,19 @@ export default function TicketDetailPage({ params }: PageProps) {
 
     mapRef.current = map;
 
+    // Auto-resize observer
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && mapContainerRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        map.resize();
+      });
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       map.remove();
       mapRef.current = null;
     };
@@ -454,9 +470,13 @@ export default function TicketDetailPage({ params }: PageProps) {
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Location & Pin
               </h3>
-              <div className="rounded-xl overflow-hidden border border-border h-48 min-h-[12rem] max-h-[12rem] relative shadow-inner">
-                <div ref={mapContainerRef} className="absolute inset-0 w-full h-full min-h-0 min-w-0" />
-                <div className="absolute bottom-2 left-2 bg-card/90 px-2 py-0.5 rounded text-[10px] font-bold border border-border">
+              <div className="rounded-xl overflow-hidden border border-border h-48 min-h-[12rem] relative shadow-inner">
+                <div
+                  ref={mapContainerRef}
+                  className="w-full h-full min-h-[12rem]"
+                  style={{ width: "100%", height: "100%", minHeight: "12rem" }}
+                />
+                <div className="absolute bottom-2 left-2 bg-card/90 px-2 py-0.5 rounded text-[10px] font-bold border border-border pointer-events-none">
                   📍 Public Location
                 </div>
               </div>
@@ -465,7 +485,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                 <p>
                   <span>Area: </span>
                   <strong className="text-foreground">
-                    {ticket.location_name || "Manchester Area"}
+                    {ticket.location_name || "Lagos Area"}
                   </strong>
                 </p>
                 <p>

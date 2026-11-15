@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CATEGORIES, SEVERITIES, IncidentCategory, IncidentSeverity } from "@/lib/types";
 import { LocationPicker } from "@/components/location-picker";
 import { stripExifAndProcessPhoto } from "@/lib/image-strip";
+import { DEFAULT_CENTER, DEFAULT_CITY } from "@/lib/map-style";
 
 export default function ReportPage() {
   const [category, setCategory] = useState<IncidentCategory>("theft");
@@ -16,10 +17,10 @@ export default function ReportPage() {
   const [incidentTime, setIncidentTime] = useState("");
   const [useCurrentTime, setUseCurrentTime] = useState(true);
 
-  // Default coordinates (Manchester center)
-  const [lat, setLat] = useState(53.4808);
-  const [lng, setLng] = useState(-2.2426);
-  const [locationName, setLocationName] = useState("Manchester, UK");
+  // Default coordinates (Lagos center)
+  const [lat, setLat] = useState(DEFAULT_CENTER[1]);
+  const [lng, setLng] = useState(DEFAULT_CENTER[0]);
+  const [locationName, setLocationName] = useState(DEFAULT_CITY);
 
   // Photo
   const [photoFile, setPhotoFile] = useState<File | null>(null);
