@@ -9,14 +9,14 @@ Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. E
 - [x] S0-04 Basic security headers in `next.config`.
 
 ## Block 1: Database (60 min)
-- [ ] S1-01 SQL migration (see ADR-0004 "Data shape rule"):
+- [x] S1-01 SQL migration (see ADR-0004 "Data shape rule"):
   - `profiles` (role user or admin, banned flag)
   - `tickets` (**public columns only**: reference code unique, category, severity, description, status, public location, is_anonymous, created_at, expires_at, flag_count, hidden)
   - `ticket_private` (ticket id, exact location, reporter id nullable, reporter email hash nullable)
   - `ticket_updates`, `comments`, `confirmations` (unique per user per ticket), `flags`, `alert_settings` (home location, radius)
-- [ ] S1-02 Row-level security: public can read non-hidden, non-expired rows of `tickets`; `ticket_private` readable only by its owner and admins; only owners and admins change their own rows; only admins can hide or ban.
-- [ ] S1-03 Postgres function returning tickets within a radius of a point and within a bounding box, filtered by category and time.
-- [ ] S1-04 Seed script with about 30 synthetic incidents around one city.
+- [x] S1-02 Row-level security: public can read non-hidden, non-expired rows of `tickets`; `ticket_private` readable only by its owner and admins; only owners and admins change their own rows; only admins can hide or ban.
+- [x] S1-03 Postgres function returning tickets within a radius of a point and within a bounding box, filtered by category and time.
+- [x] S1-04 Seed script with about 30 synthetic incidents around one city.
 
 ## Block 2: Core reporting (120 min)
 - [ ] S2-01 Report form with zod validation: all fields, severity, time, anonymous toggle, email for no-account reports.
