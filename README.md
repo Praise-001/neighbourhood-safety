@@ -1,60 +1,132 @@
-# SafeNeighbour: Community Safety & Incident Ticket Platform
+# Neighbourhood Safety
 
-> Working name. Rename freely (search/replace `SafeNeighbour`).
+> **Academic Prototype.** Not for real emergencies. In an immediate emergency, always dial official emergency services (911 / 112 / 999).
 
-Neighbours report incidents ("tickets"), and people nearby are alerted instantly. Guests can report without an account and return with their ticket reference + email. Businesses (security firms, estates, utilities) register so users can address tickets to them.
+A lightweight, privacy-focused community safety web app where residents can report local incidents in under a minute, view verified community reports on an interactive map, and receive real-time alerts within their selected home radius.
 
-## Status
-See [`TASKS.md`](./TASKS.md) for current phase and progress.
+Built on a **zero-cost architecture** with synthetic data for academic evaluation.
 
-## Read this first (humans and agents)
-| Order | File | Purpose |
-|---|---|---|
-| 1 | [`AGENTS.md`](./AGENTS.md) | How agents must behave in this repo |
-| 2 | [`docs/PRD.md`](./docs/PRD.md) | What we are building and for whom |
-| 3 | [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | How it is built |
-| 4 | [`docs/DESIGN_SYSTEM.md`](./docs/DESIGN_SYSTEM.md) | Colors, theming, accessibility |
-| 5 | [`docs/STANDARDS_CHECKLIST.md`](./docs/STANDARDS_CHECKLIST.md) | Security and reliability gates |
-| 6 | [`docs/WORKFLOW.md`](./docs/WORKFLOW.md) | Git, PRs, CI/CD, definition of done |
-| 7 | [`TASKS.md`](./TASKS.md) | What to do next |
-| Ref | [`docs/MASTER_BRIEF.md`](./docs/MASTER_BRIEF.md) | Original full brief (source of truth if files disagree) |
+---
 
-## Stack (Lean Academic Scope — see docs/adr/0003-zero-cost-student-scope.md)
-- **App:** Next.js 16 (App Router), TypeScript, Tailwind CSS, shadcn/ui, MapLibre GL, installable PWA
-- **Database, Auth & Storage:** Supabase Free Tier (PostgreSQL + PostGIS, Supabase Auth, Storage, Realtime, RLS)
-- **Alerts:** PostGIS spatial queries (`ST_DWithin`), Supabase Realtime, Web Push (VAPID)
-- **Maps & Geocoding:** MapLibre GL + OpenStreetMap / CARTO tiles, Nominatim (with debounce)
-- **Hosting & CI:** Vercel Hobby + GitHub Actions
+## Architecture Overview
 
-## Repo layout
 ```
-src/
-  app/            Next.js App Router (pages, route handlers, server actions)
-  components/     UI components (shadcn/ui, map, forms)
-  lib/            Supabase client/server helpers, geo utils, validators
-  shared/         Zod schemas, types, error formats
-supabase/
-  migrations/     SQL migrations & RLS policies
-  seeds/          Synthetic demo seed script
-docs/             PRD, ADRs, checklist, plan
+                               ┌────────────────────────────────────────┐
+                               │             Next.js 16 App             │
+                               │  (App Router, TypeScript, Tailwind v4) │
+                               └───────┬────────────────────────┬───────┘
+                                       │                        │
+                       REST / PostGIS  │                        │ Realtime WebSockets
+                                       ▼                        ▼
+                       ┌────────────────────────────────────────────────┐
+                       │                Supabase Backend                │
+                       │  - PostgreSQL + PostGIS (ST_DWithin, bounds)   │
+                       │  - Row-Level Security (RLS) on all tables      │
+                       │  - Supabase Realtime (INSERT events)           │
+                       │  - Supabase Storage (incident-photos bucket)   │
+                       └────────────────────────────────────────────────┘
 ```
 
-## Quick start (target: under 5 minutes — no Docker needed)
+### Privacy & Data Shape (ADR-0004)
+1. **Public vs Private Partitioning:** Supabase Realtime broadcasts changed rows to subscribers. To prevent data leakage, the public `tickets` table holds **public columns only**. Exact coordinates and reporter identity live in `ticket_private`, readable only by the reporter and administrators.
+2. **Coordinate Rounding:** For sensitive categories (`missing_person`, `suspicious_activity`), public coordinates are automatically rounded to 2 decimal places (~1.1 km precision) to protect residence privacy while keeping neighbourhood awareness intact.
+3. **EXIF/GPS Stripping:** Attached photos are drawn onto an in-browser HTML5 `<canvas>` and re-encoded before upload, completely stripping GPS location tags and camera metadata before network transmission.
+4. **No-Account Reporting:** Incident reports can be submitted with only an email and anonymous toggle; a short unique reference code (e.g. `MCR-8101`) allows status lookup on `/status`.
+
+---
+
+## Tech Stack (Zero-Cost)
+
+- **Framework:** Next.js 16 (App Router, Turbopack, Server-side API routes)
+- **Styling & Theming:** Tailwind CSS v4, custom tokens (deep navy `#0B192C`, amber yellow `#F59E0B`, white `#FFFFFF`), with dark/light mode toggle
+- **Maps:** MapLibre GL 6 with OpenStreetMap raster tiles (no API keys, zero cost)
+- **Geocoding:** OpenStreetMap Nominatim with server-side rate-limiting (max 1 req/sec) and custom descriptive User-Agent
+- **Database & Storage:** Supabase Free Tier (PostgreSQL with PostGIS extension, Row-Level Security, Storage, Realtime)
+- **Validation & Testing:** Zod 4 for strict runtime validation, Vitest 5 for unit and security RLS testing
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js `v20+` (tested on Node `v24.22.1`)
+- pnpm `v10+` or `v12+`
+
+### 1. Installation
 ```bash
+git clone <repo-url>
+cd project-kit
 pnpm install
-cp .env.example .env.local       # add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
-pnpm dev                         # run Next.js at http://localhost:3000
 ```
 
-## Common commands
-| Command | What it does |
-|---|---|
-| `pnpm dev` | Run Next.js with hot reload |
-| `pnpm lint` / `pnpm typecheck` | Static code & type checks |
-| `pnpm test` | Unit + integration tests |
-| `pnpm test:e2e` | Playwright tests |
-| `pnpm db:seed` | Populate synthetic demo data |
-| `pnpm audit:security` | Dependency + secret audit |
+### 2. Environment Setup
+Create `.env.local` in the project root:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-## Contributing
-Read [`docs/WORKFLOW.md`](./docs/WORKFLOW.md). Security issues: see `SECURITY.md`.
+### 3. Database Migration
+In your Supabase project dashboard:
+1. Enable `postgis` under **Database** → **Extensions**.
+2. Run the SQL script in [`supabase/migrations/20261115000000_sprint_schema.sql`](./supabase/migrations/20261115000000_sprint_schema.sql) in the **SQL Editor**.
+
+### 4. Seed Synthetic Data
+Populates 30 synthetic incidents around Manchester, UK:
+```bash
+pnpm run seed
+```
+
+### 5. Run Development Server
+```bash
+pnpm dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## Running Verification & Tests
+
+```bash
+# Run unit & live Row-Level Security tests (18 tests)
+pnpm test
+
+# Run TypeScript strict typecheck
+pnpm run typecheck
+
+# Run production build
+pnpm run build
+```
+
+---
+
+## Application Routes
+
+| Route | Description |
+|---|---|
+| `/` | Landing page, feature highlights, and call-to-actions |
+| `/report` | Incident reporting form with draggable map, GPS, photo upload, and anonymous toggle |
+| `/map` | Live interactive map with clustering, severity markers, and dual feed list view |
+| `/tickets/[id]` | Ticket detail page with photo, official timeline updates, comments, and "I see this too" button |
+| `/alerts` | In-app perimeter alert settings (500m, 1km, 5km radius with Realtime banner notifications) |
+| `/status` | Public status lookup by reference code (no account required) |
+| `/admin` | Moderation queue for flagged reports, auto-hidden items, and user bans |
+| `/auth` | Optional email magic-link sign-in |
+
+---
+
+## Future Work (Intentionally Cut for Sprint Scope in ADR-0004)
+
+The following features were scoped out to fit the 14-hour academic sprint budget and zero-cost constraints:
+- **Business Portal & Assignment:** Organization registration, business tiers, and assigning incidents to security firms or municipal utilities.
+- **Guest Return Flow:** Guest session cookies, email magic link lookup, and guest-to-account profile merging.
+- **Multi-Role RBAC:** Granular role system beyond `user` and `admin` (e.g. `dispatcher`, `verified_responder`, `community_lead`).
+- **Web Push Notifications:** VAPID Web Push, scheduled digests, quiet hours, and per-category notification filters.
+- **Automated Duplicate Merging:** Embedding-based duplicate incident detection and cluster merging.
+- **Heat Maps & Density Analysis:** Kernel density estimation (KDE) heat maps for long-term crime trends.
+- **Video Uploads:** Transcoding pipeline, thumbnail generation, and streaming video playback.
+- **PWA & Offline Service Workers:** Progressive Web App installation manifest and offline sync queue.
+- **Enterprise Authentication:** Phone/SMS OTP login, WebAuthn/Passkeys, SSO/SAML, and 2FA.
+- **Infrastructure Scaling:** Redis queues, BullMQ, Docker Compose, Terraform, and CDN caching layers.

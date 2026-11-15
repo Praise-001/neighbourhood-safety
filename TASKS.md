@@ -43,10 +43,10 @@ Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. E
 - [x] S5-03 Basic row-level security tests: public data never exposes the reporter, a normal user cannot hide tickets, banned users cannot report, `ticket_private` is not readable by others.
 
 ## Block 6: Polish and deploy (90 min)
-- [ ] S6-01 Accessibility pass: labels, focus, contrast, works at phone width.
-- [ ] S6-02 Empty, loading and error states on every page.
+- [x] S6-01 Accessibility pass: labels, focus, contrast, works at phone width.
+- [x] S6-02 Empty, loading and error states on every page.
 - [ ] S6-03 **Owner action:** push the repo to GitHub, then deploy to Vercel (agent gives exact steps); set env vars; check the live link end to end.
-- [ ] S6-04 README with setup steps, a short architecture note, and a future-work list (everything cut in ADR-0004).
+- [x] S6-04 README with setup steps, a short architecture note, and a future-work list (everything cut in ADR-0004).
 
 ## Block 7: Buffer and demo prep (60 min)
 - [ ] S7-01 Fix whatever is broken. Rehearse the demo: report without an account, see it on the map, get an alert in a second window, flag a report, admin removes it.
