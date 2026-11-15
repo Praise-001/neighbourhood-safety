@@ -58,6 +58,39 @@ describe("Row-Level Security & Privacy Tests (S5-03)", () => {
     }
   });
 
+  it("logged-out and normal-user access to admin data fails (F5)", async () => {
+    // 1. Anon client cannot select hidden tickets
+    const { data: hiddenTickets } = await supabase
+      .from("tickets")
+      .select("id, hidden")
+      .eq("hidden", true);
+    expect(hiddenTickets?.length ?? 0).toBe(0);
+
+    // 2. Anon client cannot read any ticket_private data
+    const { data: privRows } = await supabase
+      .from("ticket_private")
+      .select("exact_lat, exact_lng, reporter_email");
+    expect(privRows?.length ?? 0).toBe(0);
+
+    // 3. API route rejects unauthenticated requests
+    const { GET } = await import("@/app/api/admin/reports/route");
+    const unauthReq = new Request("http://localhost:3000/api/admin/reports", {
+      method: "GET",
+    });
+    const unauthRes = await GET(unauthReq as any);
+    expect(unauthRes.status).toBe(401);
+    const unauthJson = await unauthRes.json();
+    expect(unauthJson.error).toContain("Authentication required");
+
+    // 4. API route rejects invalid / forged token
+    const forgedReq = new Request("http://localhost:3000/api/admin/reports", {
+      method: "GET",
+      headers: { Authorization: "Bearer forged-invalid-jwt-token" },
+    });
+    const forgedRes = await GET(forgedReq as any);
+    expect(forgedRes.status).toBe(401);
+  });
+
   it("auto-hide rule: auto-hides reports when 3 flags are recorded", () => {
     const threshold = 3;
     expect(threshold).toBe(3);

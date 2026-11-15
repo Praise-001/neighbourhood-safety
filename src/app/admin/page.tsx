@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Ticket, CATEGORIES, SEVERITIES } from "@/lib/types";
+import { supabase } from "@/lib/supabase/client";
 
 interface AdminTicket extends Ticket {
   ticket_private?: {
@@ -16,15 +17,58 @@ interface AdminTicket extends Ticket {
 export default function AdminPage() {
   const [tickets, setTickets] = useState<AdminTicket[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReports = async () => {
+  useEffect(() => {
+    const initAuth = async () => {
+      setAuthChecking(true);
+      setError(null);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        setIsAdmin(false);
+        setAuthChecking(false);
+        return;
+      }
+
+      setSessionToken(session.access_token);
+
+      // Verify admin role
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, banned")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profile && profile.role === "admin" && !profile.banned) {
+        setIsAdmin(true);
+        fetchReports(session.access_token);
+      } else {
+        setIsAdmin(false);
+      }
+      setAuthChecking(false);
+    };
+
+    initAuth();
+  }, []);
+
+  const fetchReports = async (token?: string) => {
+    const activeToken = token || sessionToken;
+    if (!activeToken) return;
+
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch("/api/admin/reports");
+      const res = await fetch("/api/admin/reports", {
+        headers: {
+          Authorization: `Bearer ${activeToken}`,
+        },
+      });
       const data = await res.json();
 
       if (!res.ok) {
@@ -40,11 +84,9 @@ export default function AdminPage() {
     }
   };
 
-  useEffect(() => {
-    fetchReports();
-  }, []);
-
   const handleAction = async (action: "restore" | "remove" | "ban", ticket: AdminTicket) => {
+    if (!sessionToken) return;
+
     setActionInProgress(ticket.id);
     setMessage(null);
     setError(null);
@@ -52,11 +94,14 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/reports", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
         body: JSON.stringify({
           action,
           ticket_id: ticket.id,
-          email: ticket.ticket_private?.reporter_email,
+          reporter_id: ticket.ticket_private?.reporter_email ? undefined : undefined,
         }),
       });
 
@@ -75,6 +120,45 @@ export default function AdminPage() {
     }
   };
 
+  if (authChecking) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-3">
+        <div className="w-8 h-8 border-3 border-yellow/20 border-t-yellow rounded-full animate-spin" />
+        <p className="text-xs text-muted-foreground font-medium">Verifying administrator credentials...</p>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex-1 max-w-lg w-full mx-auto px-4 py-16 flex flex-col items-center justify-center text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center text-2xl font-bold shadow-xs">
+          🔒
+        </div>
+        <h1 className="text-2xl font-black tracking-tight text-foreground">
+          Administrator Access Required
+        </h1>
+        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          The moderation queue and admin controls are restricted to authorized accounts. Sign in with an administrator email to continue.
+        </p>
+        <div className="pt-2 flex gap-3">
+          <Link
+            href="/auth"
+            className="px-5 py-2.5 rounded-lg bg-yellow text-slate-950 font-bold text-xs sm:text-sm hover:bg-yellow-hover transition-all shadow-sm"
+          >
+            Sign In with Magic Link
+          </Link>
+          <Link
+            href="/map"
+            className="px-5 py-2.5 rounded-lg border border-border bg-card hover:bg-muted text-xs sm:text-sm font-semibold transition-colors"
+          >
+            Back to Map
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const flaggedCount = tickets.filter((t) => t.flag_count > 0).length;
   const hiddenCount = tickets.filter((t) => t.hidden).length;
 
@@ -92,7 +176,7 @@ export default function AdminPage() {
 
         <button
           type="button"
-          onClick={fetchReports}
+          onClick={() => fetchReports()}
           disabled={loading}
           className="px-3 py-1.5 rounded-md border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-colors shadow-sm"
         >

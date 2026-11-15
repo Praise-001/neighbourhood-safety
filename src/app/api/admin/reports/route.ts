@@ -1,8 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-export async function GET() {
+async function verifyAdminAuth(req: NextRequest): Promise<{ authorized: true; userId: string } | { authorized: false; status: number; error: string }> {
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return { authorized: false, status: 401, error: "Authentication required. Please sign in as an admin." };
+  }
+
+  const token = authHeader.substring(7).trim();
+  const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+  if (userError || !user) {
+    return { authorized: false, status: 401, error: "Invalid or expired session. Please sign in again." };
+  }
+
+  // Verify role in profiles table
+  const { data: profile, error: profileError } = await supabaseAdmin
+    .from("profiles")
+    .select("role, banned")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || !profile || profile.role !== "admin" || profile.banned) {
+    return { authorized: false, status: 403, error: "Access denied. Administrator privileges required." };
+  }
+
+  return { authorized: true, userId: user.id };
+}
+
+export async function GET(req: NextRequest) {
   try {
+    const authResult = await verifyAdminAuth(req);
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     // List flagged or hidden tickets
     const { data: tickets, error } = await supabaseAdmin
       .from("tickets")
@@ -32,8 +63,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const authResult = await verifyAdminAuth(req);
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     const body = await req.json();
-    const { action, ticket_id, email, reporter_id } = body;
+    const { action, ticket_id, reporter_id } = body;
 
     if (!action || !ticket_id) {
       return NextResponse.json({ error: "Action and ticket_id are required" }, { status: 400 });
