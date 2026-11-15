@@ -38,9 +38,9 @@ Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. E
 - [x] S4-03 Test with two browser windows: report in one, alert in the other inside the radius, none outside.
 
 ## Block 5: Trust and admin (60 min)
-- [ ] S5-01 Flag-as-false button; auto-hide at 3 flags.
-- [ ] S5-02 Admin page: list flagged and hidden reports, restore or remove, ban a user.
-- [ ] S5-03 Basic row-level security tests: public data never exposes the reporter, a normal user cannot hide tickets, banned users cannot report, `ticket_private` is not readable by others.
+- [x] S5-01 Flag-as-false button; auto-hide at 3 flags.
+- [x] S5-02 Admin page: list flagged and hidden reports, restore or remove, ban a user.
+- [x] S5-03 Basic row-level security tests: public data never exposes the reporter, a normal user cannot hide tickets, banned users cannot report, `ticket_private` is not readable by others.
 
 ## Block 6: Polish and deploy (90 min)
 - [ ] S6-01 Accessibility pass: labels, focus, contrast, works at phone width.
