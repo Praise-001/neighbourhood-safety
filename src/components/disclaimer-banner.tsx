@@ -16,7 +16,7 @@ export function DisclaimerBanner() {
         </div>
         <div className="hidden sm:flex items-center gap-1 text-slate-400">
           <span>In immediate danger?</span>
-          <span className="text-yellow font-semibold">Dial 911 / 112 / 999</span>
+          <span className="text-yellow font-semibold">Dial 112 (Nigeria Emergency Services)</span>
         </div>
       </div>
     </div>

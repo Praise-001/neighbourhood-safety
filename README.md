@@ -1,6 +1,6 @@
 # Neighbourhood Safety
 
-> **Academic Prototype.** Not for real emergencies. In an immediate emergency, always dial official emergency services (911 / 112 / 999).
+> **Academic Prototype.** Not for real emergencies. In an immediate emergency, always dial official emergency services (112 in Nigeria).
 
 A lightweight, privacy-focused community safety web app where residents can report local incidents in under a minute, view verified community reports on an interactive map, and receive real-time alerts within their selected home radius.
 
