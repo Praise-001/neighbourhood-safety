@@ -32,6 +32,7 @@ export default function ReportPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [successCode, setSuccessCode] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   // Handle Photo selection with browser EXIF stripping (S2-04)
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +64,13 @@ export default function ReportPage() {
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setPhotoPreview(null);
     setPhotoStrippedNotice(false);
+  };
+
+  const copyCodeToClipboard = () => {
+    if (!successCode) return;
+    navigator.clipboard.writeText(successCode);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2500);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -131,46 +139,56 @@ export default function ReportPage() {
     }
   };
 
-  // Success Screen (S2-05)
+  // Success Screen
   if (successCode) {
     return (
-      <div className="flex-1 max-w-2xl w-full mx-auto px-4 py-12 flex flex-col items-center justify-center">
-        <div className="w-full bg-card border border-border rounded-xl p-6 sm:p-8 text-center space-y-6 shadow-lg">
-          <div className="w-16 h-16 bg-yellow/20 text-yellow rounded-full flex items-center justify-center mx-auto text-3xl">
+      <div className="flex-1 max-w-xl w-full mx-auto px-4 py-12 flex flex-col items-center justify-center">
+        <div className="w-full bg-card border border-border rounded-2xl p-6 sm:p-8 text-center space-y-6 shadow-xl animate-fade-in">
+          <div className="w-16 h-16 bg-yellow/20 text-yellow rounded-2xl flex items-center justify-center mx-auto text-3xl font-black shadow-inner">
             ✓
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">
-              Report Submitted Successfully
+            <h1 className="text-2xl sm:text-3xl font-black text-foreground">
+              Incident Report Submitted
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Your report has been broadcast to local community members. Keep your reference code to check its status.
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto">
+              Your report is now live on the community map and broadcast to neighbours within radius.
             </p>
           </div>
 
-          <div className="p-4 rounded-lg bg-navy text-white border border-yellow/40 space-y-2">
-            <span className="text-xs uppercase tracking-wider text-yellow font-semibold">
-              Your Reference Code
+          {/* Reference Code Card */}
+          <div className="p-5 rounded-xl bg-navy text-white border border-yellow/40 space-y-3 shadow-md">
+            <span className="text-[11px] uppercase tracking-widest text-yellow font-bold">
+              Your Incident Reference Code
             </span>
             <div className="text-3xl sm:text-4xl font-mono font-black tracking-widest text-yellow">
               {successCode}
             </div>
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={copyCodeToClipboard}
+                className="px-3.5 py-1.5 rounded-lg bg-card text-foreground hover:bg-muted font-bold text-xs transition-colors border border-border/60"
+              >
+                {copiedCode ? "✓ Copied to clipboard!" : "📋 Copy Reference Code"}
+              </button>
+            </div>
             <p className="text-[11px] text-slate-300">
-              No account required. Use this code to view your report at any time.
+              No account required. Use this code anytime to view status and updates.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Link
               href={`/status?code=${successCode}`}
-              className="px-5 py-2.5 rounded-lg bg-yellow text-slate-950 font-bold hover:bg-yellow-hover transition-colors shadow-sm text-sm"
+              className="px-5 py-2.5 rounded-xl bg-yellow text-slate-950 font-bold hover:bg-yellow-hover transition-colors shadow-sm text-sm"
             >
               View Report Status
             </Link>
             <Link
               href="/map"
-              className="px-5 py-2.5 rounded-lg border border-border bg-card text-foreground font-semibold hover:bg-muted transition-colors text-sm"
+              className="px-5 py-2.5 rounded-xl border border-border bg-card text-foreground font-semibold hover:bg-muted transition-colors text-sm"
             >
               Explore Live Map
             </Link>
@@ -196,68 +214,92 @@ export default function ReportPage() {
   const selectedCategoryConfig = CATEGORIES.find((c) => c.value === category);
 
   return (
-    <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 py-8">
-      <div className="mb-6 space-y-1">
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+    <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+      {/* Page Title */}
+      <div className="space-y-1">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
           Report an Incident
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Quickly notify neighbours and local response teams. Takes under 1 minute.
+        <p className="text-xs sm:text-sm text-muted-foreground">
+          Takes under 60 seconds. Community members nearby will be alerted immediately.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="mb-6 p-4 rounded-lg bg-red-100 border border-red-300 text-red-800 dark:bg-red-950/50 dark:border-red-800 dark:text-red-200 text-sm flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-red-100 border border-red-300 text-red-800 dark:bg-red-950/60 dark:border-red-900 dark:text-red-200 text-sm flex items-center gap-2">
           <span>⚠️</span>
           <span>{errorMsg}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Category Picker */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
-            Category <span className="text-red-500">*</span>
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {/* Step 1: Category Picker */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+              1. Incident Category <span className="text-red-500">*</span>
+            </label>
+            <span className="text-xs text-muted-foreground">
+              Select the option that best describes the hazard or incident.
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {CATEGORIES.map((cat) => (
               <button
                 type="button"
                 key={cat.value}
                 onClick={() => setCategory(cat.value)}
-                className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all ${
+                className={`p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all ${
                   category === cat.value
-                    ? "border-yellow bg-yellow-light/20 ring-2 ring-yellow text-foreground"
-                    : "border-border bg-card hover:bg-muted text-foreground"
+                    ? "border-yellow bg-yellow/10 ring-2 ring-yellow text-foreground shadow-xs"
+                    : "border-border bg-background hover:bg-muted/50 text-foreground"
                 }`}
               >
-                <span className="text-xl">{cat.icon}</span>
-                <span className="text-xs font-bold leading-tight">{cat.label}</span>
-                {cat.sensitive && (
-                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-                    Privacy rounded
-                  </span>
-                )}
+                <span className="text-2xl">{cat.icon}</span>
+                <div className="mt-2">
+                  <span className="text-xs font-bold block leading-tight">{cat.label}</span>
+                  {cat.sensitive && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold block mt-0.5">
+                      🛡️ Privacy grid
+                    </span>
+                  )}
+                </div>
               </button>
             ))}
           </div>
+
+          {selectedCategoryConfig?.sensitive && (
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2">
+              <span className="text-base">🛡️</span>
+              <div>
+                <strong>Privacy Protection Active:</strong> For {selectedCategoryConfig.label}, public coordinates are automatically rounded to ~1.1 km to protect residence privacy. Exact coordinates are kept strictly private.
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Severity Picker */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
-            Severity Level <span className="text-red-500">*</span>
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {/* Step 2: Severity Level */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+              2. Severity Level <span className="text-red-500">*</span>
+            </label>
+            <span className="text-xs text-muted-foreground">
+              Critical severity triggers stronger priority alerts for local residents.
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {SEVERITIES.map((sev) => (
               <button
                 type="button"
                 key={sev.value}
                 onClick={() => setSeverity(sev.value)}
-                className={`px-3 py-2 rounded-lg border text-center text-xs font-bold transition-all ${
+                className={`py-3 px-3 rounded-xl border text-center text-xs font-bold transition-all ${
                   severity === sev.value
-                    ? "border-yellow ring-2 ring-yellow " + sev.color
-                    : "border-border bg-card hover:bg-muted text-foreground"
+                    ? "border-yellow ring-2 ring-yellow " + sev.color + " shadow-xs"
+                    : "border-border bg-background hover:bg-muted text-foreground"
                 }`}
               >
                 {sev.label}
@@ -266,185 +308,191 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Title */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-foreground">
-            Incident Title <span className="text-red-500">*</span>
+        {/* Step 3: Incident Details */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+            3. What Happened? <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Broken streetlight or suspicious vehicle"
-            maxLength={100}
-            className="w-full px-3 py-2 rounded-md border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow text-sm"
-          />
-          {fieldErrors.title && (
-            <p className="text-xs text-red-500">{fieldErrors.title[0]}</p>
-          )}
-        </div>
 
-        {/* Description */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-semibold text-foreground">
-              Description <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-foreground">
+              Title / Short Summary <span className="text-red-500">*</span>
             </label>
-            <span className="text-xs text-muted-foreground">
-              {description.length} / 1500
-            </span>
+            <input
+              type="text"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Broken water main flooding cycleway"
+              maxLength={100}
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow text-sm"
+            />
+            {fieldErrors.title && (
+              <p className="text-xs text-red-500">{fieldErrors.title[0]}</p>
+            )}
           </div>
-          <textarea
-            required
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe what happened, any distinctive features, vehicles, or hazards..."
-            maxLength={1500}
-            className="w-full px-3 py-2 rounded-md border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow text-sm"
-          />
-          {fieldErrors.description && (
-            <p className="text-xs text-red-500">{fieldErrors.description[0]}</p>
-          )}
-        </div>
 
-        {/* Time of Incident */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-semibold text-foreground">
-              When did it happen?
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-semibold text-foreground">
+                Detailed Description <span className="text-red-500">*</span>
+              </label>
+              <span className="text-[11px] text-muted-foreground">
+                {description.length} / 1500
+              </span>
+            </div>
+            <textarea
+              required
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Provide context, identifying details, vehicle descriptions, or immediate hazards..."
+              maxLength={1500}
+              className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow text-sm"
+            />
+            {fieldErrors.description && (
+              <p className="text-xs text-red-500">{fieldErrors.description[0]}</p>
+            )}
+          </div>
+
+          {/* Time */}
+          <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
+            <label className="text-xs font-semibold text-foreground">
+              Incident Occurrence:
             </label>
-            <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
+            <label className="inline-flex items-center gap-2 text-xs text-foreground cursor-pointer">
               <input
                 type="checkbox"
                 checked={useCurrentTime}
                 onChange={(e) => setUseCurrentTime(e.target.checked)}
-                className="rounded border-border text-yellow focus:ring-yellow"
+                className="h-4 w-4 rounded border-border text-yellow focus:ring-yellow"
               />
-              Happening now
+              <span>Happening right now</span>
             </label>
+            {!useCurrentTime && (
+              <input
+                type="datetime-local"
+                value={incidentTime}
+                onChange={(e) => setIncidentTime(e.target.value)}
+                className="px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-2 focus:ring-yellow"
+              />
+            )}
           </div>
-          {!useCurrentTime && (
-            <input
-              type="datetime-local"
-              value={incidentTime}
-              onChange={(e) => setIncidentTime(e.target.value)}
-              className="px-3 py-1.5 rounded-md border border-border bg-card text-foreground text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-yellow"
-            />
-          )}
         </div>
 
-        {/* Location Picker with GPS & Pin (S2-02) */}
-        <LocationPicker
-          lat={lat}
-          lng={lng}
-          locationName={locationName}
-          onChange={(coords) => {
-            setLat(coords.lat);
-            setLng(coords.lng);
-            if (coords.locationName) setLocationName(coords.locationName);
-          }}
-        />
+        {/* Step 4: Location Picker */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
+          <LocationPicker
+            lat={lat}
+            lng={lng}
+            locationName={locationName}
+            onChange={(coords) => {
+              setLat(coords.lat);
+              setLng(coords.lng);
+              if (coords.locationName) setLocationName(coords.locationName);
+            }}
+          />
+        </div>
 
-        {selectedCategoryConfig?.sensitive && (
-          <div className="p-3 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs">
-            🛡️ <strong>Privacy Protection Active:</strong> For {selectedCategoryConfig.label}, public map coordinates are automatically rounded to ~1.1 km to protect residence privacy. Exact coordinates are kept strictly private.
-          </div>
-        )}
-
-        {/* Photo Upload with client-side EXIF stripping (S2-04) */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
-            Photo (Optional, 1 photo max, up to 5 MB)
+        {/* Step 5: Photo & Privacy Controls */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+            4. Photo & Reporter Identity
           </label>
-          <div className="flex items-center gap-4">
-            <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition-colors shadow-sm">
-              <svg className="w-4 h-4 text-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>{photoPreview ? "Change Photo" : "Upload Photo"}</span>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handlePhotoChange}
-                disabled={photoUploading}
-                className="hidden"
-              />
+
+          {/* Photo upload zone */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-foreground">
+              Attach Evidence Photo (Optional · 1 photo max, up to 5 MB)
             </label>
 
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-border bg-background hover:bg-muted text-xs font-bold text-foreground transition-all shadow-2xs">
+                <span className="text-base text-yellow">📷</span>
+                <span>{photoPreview ? "Change Photo" : "Upload Photo"}</span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handlePhotoChange}
+                  disabled={photoUploading}
+                  className="hidden"
+                />
+              </label>
+
+              {photoPreview && (
+                <button
+                  type="button"
+                  onClick={removePhoto}
+                  className="text-xs text-red-500 hover:underline font-semibold"
+                >
+                  Remove Photo
+                </button>
+              )}
+            </div>
+
+            {photoStrippedNotice && (
+              <p className="text-[11px] text-green-600 dark:text-green-400 font-semibold flex items-center gap-1.5 pt-1">
+                <span>🛡️</span>
+                <span>Camera metadata and GPS tags stripped directly in your browser before upload.</span>
+              </p>
+            )}
+
             {photoPreview && (
-              <button
-                type="button"
-                onClick={removePhoto}
-                className="text-xs text-red-500 hover:underline"
-              >
-                Remove
-              </button>
+              <div className="mt-3 w-36 h-36 rounded-xl overflow-hidden border border-border shadow-md">
+                <img
+                  src={photoPreview}
+                  alt="Upload preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
           </div>
 
-          {photoStrippedNotice && (
-            <p className="text-[11px] text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
-              ✓ Location data stripped by re-encoding image in your browser before upload.
-            </p>
-          )}
-
-          {photoPreview && (
-            <div className="mt-2 w-32 h-32 rounded-lg overflow-hidden border border-border relative">
-              <img
-                src={photoPreview}
-                alt="Upload preview"
-                className="w-full h-full object-cover"
+          {/* Anonymous toggle card */}
+          <div className="pt-4 border-t border-border space-y-4">
+            <label className="flex items-start gap-3 cursor-pointer p-3.5 rounded-xl bg-background border border-border">
+              <input
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-border text-yellow focus:ring-yellow"
               />
-            </div>
-          )}
-        </div>
+              <div>
+                <span className="text-xs font-bold text-foreground block">
+                  Submit Report Anonymously
+                </span>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  When enabled, public data never includes your identity or contact information.
+                </p>
+              </div>
+            </label>
 
-        {/* Anonymous Toggle (ADR-0004) */}
-        <div className="p-4 rounded-lg border border-border bg-card space-y-3">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-border text-yellow focus:ring-yellow"
-            />
+            {/* Email for status tracking */}
             <div>
-              <span className="text-sm font-semibold text-foreground">
-                Submit Anonymously
-              </span>
-              <p className="text-xs text-muted-foreground">
-                When enabled, public data never includes your identity or contact information.
+              <label className="text-xs font-semibold text-foreground">
+                Your Email Address {isAnonymous ? "(Optional for anonymous reports)" : "(For report verification)"}
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                className="mt-1 w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow"
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Kept strictly in protected private tables. Never displayed on public map.
               </p>
             </div>
-          </label>
-
-          {/* Email for no-account reports */}
-          <div className="pt-2 border-t border-border">
-            <label className="text-xs font-semibold text-foreground">
-              Your Email {isAnonymous ? "(Optional for anonymous reports)" : "(For report verification)"}
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. name@example.com"
-              className="mt-1 w-full px-3 py-1.5 rounded-md border border-border bg-card text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow"
-            />
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              Stored securely in private tables only. Never displayed on the public map.
-            </p>
           </div>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3.5 px-4 rounded-lg bg-yellow text-slate-950 font-bold hover:bg-yellow-hover disabled:opacity-50 transition-colors shadow-md text-base"
+          className="w-full py-4 px-6 rounded-xl bg-yellow text-slate-950 font-black hover:bg-yellow-hover disabled:opacity-50 transition-all shadow-md hover:shadow-lg text-base text-center"
         >
-          {isSubmitting ? "Broadcasting Report..." : "Submit Incident Report"}
+          {isSubmitting ? "Broadcasting to Local Grid..." : "Submit Incident Report"}
         </button>
       </form>
     </div>

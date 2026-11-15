@@ -17,7 +17,7 @@ export default function AlertSettingsPage() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
 
-  // Helper to generate a polygon GeoJSON circle from center and radius in meters
+  // Helper to generate circle GeoJSON
   const createGeoJSONCircle = (center: [number, number], radiusInMeters: number, points = 64) => {
     const coords = [];
     const km = radiusInMeters / 1000;
@@ -144,7 +144,7 @@ export default function AlertSettingsPage() {
     };
   }, []);
 
-  // Update circle and marker when home coordinates or radius change
+  // Update circle and marker
   useEffect(() => {
     if (mapRef.current) {
       const source = mapRef.current.getSource("radius-circle") as maplibregl.GeoJSONSource | undefined;
@@ -157,7 +157,7 @@ export default function AlertSettingsPage() {
     }
   }, [homeLat, homeLng, radiusMeters]);
 
-  // Handle GPS location
+  // GPS
   const handleUseGPS = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -191,7 +191,6 @@ export default function AlertSettingsPage() {
       radius_meters: radiusMeters,
     };
 
-    // Store in localStorage immediately for instant client provider detection
     localStorage.setItem("ns_alert_settings", JSON.stringify(payload));
     window.dispatchEvent(new Event("ns_alert_settings_updated"));
 
@@ -211,42 +210,76 @@ export default function AlertSettingsPage() {
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 4000);
     } catch {
-      // Still saved locally
       setSavedSuccess(true);
     } finally {
       setIsSaving(false);
     }
   };
 
+  // Simulate alert test
+  const handleSimulateAlert = () => {
+    const simulated = {
+      id: "sim-" + Date.now(),
+      reference_code: "DEMO-991",
+      category: "fire",
+      severity: "critical",
+      title: "Simulated Critical Hazard in Your Perimeter",
+      description: "This is a demonstration of the live Realtime banner that triggers when an incident occurs inside your radius.",
+      status: "investigating",
+      location_name: "Near your home pin",
+      public_lat: homeLat + 0.001,
+      public_lng: homeLng + 0.001,
+      confirmation_count: 4,
+      flag_count: 0,
+      hidden: false,
+      incident_time: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 86400000).toISOString(),
+      is_anonymous: false,
+      photo_url: null,
+    };
+    window.dispatchEvent(new CustomEvent("simulate_alert", { detail: simulated }));
+  };
+
   return (
-    <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-          In-App Alert Settings
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Define your home location and alert perimeter. Receive instant notifications via Supabase Realtime when new incidents happen near you.
-        </p>
+    <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+            Perimeter Alert Settings
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Configure your home coordinates and alert radius. When incidents happen inside, you will receive an in-app banner.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleSimulateAlert}
+          className="px-3.5 py-1.5 rounded-xl border border-yellow/50 bg-yellow/10 text-yellow text-xs font-bold hover:bg-yellow hover:text-slate-950 transition-all shadow-2xs whitespace-nowrap"
+        >
+          ⚡ Test Live Alert Banner
+        </button>
       </div>
 
       {savedSuccess && (
-        <div className="p-3 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-200 text-xs font-semibold flex items-center gap-2">
+        <div className="p-3.5 rounded-xl bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-200 text-xs font-bold flex items-center gap-2 animate-fade-in">
           <span>✓</span>
-          <span>Alert settings saved. Live Realtime monitoring is active for your radius!</span>
+          <span>Alert perimeter saved. Live Realtime monitoring active for your radius!</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-3 rounded-lg bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200 text-xs">
+        <div className="p-3.5 rounded-xl bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200 text-xs">
           ⚠️ {errorMsg}
         </div>
       )}
 
-      <div className="bg-card border border-border rounded-xl p-6 space-y-6 shadow-sm">
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
         {/* Radius Choice */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
-            Alert Perimeter Radius
+        <div className="space-y-2.5">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+            1. Alert Perimeter Radius
           </label>
           <div className="grid grid-cols-3 gap-3">
             {[500, 1000, 5000].map((r) => (
@@ -254,16 +287,16 @@ export default function AlertSettingsPage() {
                 type="button"
                 key={r}
                 onClick={() => setRadiusMeters(r as 500 | 1000 | 5000)}
-                className={`py-3 px-4 rounded-lg border text-center transition-all ${
+                className={`py-3.5 px-4 rounded-xl border text-center transition-all ${
                   radiusMeters === r
-                    ? "border-yellow bg-yellow/10 ring-2 ring-yellow text-foreground font-bold"
+                    ? "border-yellow bg-yellow/10 ring-2 ring-yellow text-foreground font-black shadow-xs"
                     : "border-border bg-background hover:bg-muted text-muted-foreground font-medium"
                 }`}
               >
                 <div className="text-base sm:text-lg">
                   {r === 500 ? "500 m" : r === 1000 ? "1 km" : "5 km"}
                 </div>
-                <div className="text-[11px] opacity-75">
+                <div className="text-[11px] opacity-75 mt-0.5">
                   {r === 500 ? "Immediate Street" : r === 1000 ? "Neighbourhood" : "Wider District"}
                 </div>
               </button>
@@ -274,44 +307,44 @@ export default function AlertSettingsPage() {
         {/* Map Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
-            <label className="text-sm font-semibold text-foreground">
-              Home Location Pin
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+              2. Home Location Pin
             </label>
             <p className="text-xs text-muted-foreground">
-              Drag the marker or click on the map to set your home center.
+              Drag the golden marker or click on the map to set your home center.
             </p>
           </div>
 
           <button
             type="button"
             onClick={handleUseGPS}
-            className="px-3 py-1.5 rounded-md bg-navy text-white text-xs font-semibold hover:bg-navy-light transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-lg bg-card border border-border text-foreground text-xs font-bold hover:bg-muted transition-colors flex items-center gap-1.5 shadow-2xs"
           >
             <span>📍</span>
-            <span>Use My Current GPS</span>
+            <span>Use My GPS</span>
           </button>
         </div>
 
         {/* Interactive Map */}
-        <div className="rounded-lg overflow-hidden border border-border h-72 sm:h-80 relative shadow-inner">
+        <div className="rounded-xl overflow-hidden border border-border h-72 sm:h-80 relative shadow-inner">
           <div ref={mapContainerRef} className="w-full h-full" />
-          <div className="absolute bottom-2 left-2 bg-card/90 backdrop-blur px-2.5 py-1 rounded text-xs border border-border shadow-sm text-foreground">
-            Active Perimeter: <strong>{radiusMeters < 1000 ? `${radiusMeters} m` : `${radiusMeters / 1000} km`}</strong> radius
+          <div className="absolute bottom-2.5 left-2.5 bg-card/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-semibold border border-border shadow-sm text-foreground">
+            Perimeter: <strong>{radiusMeters < 1000 ? `${radiusMeters} m` : `${radiusMeters / 1000} km`}</strong> radius
           </div>
         </div>
 
-        {/* Coordinates readout and save button */}
+        {/* Save Button Bar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2 border-t border-border">
           <div className="text-xs text-muted-foreground">
             <span>Center: </span>
-            <strong>{homeLat.toFixed(5)}, {homeLng.toFixed(5)}</strong>
+            <strong className="text-foreground font-mono">{homeLat.toFixed(5)}, {homeLng.toFixed(5)}</strong>
           </div>
 
           <button
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="px-6 py-2.5 rounded-lg bg-yellow text-slate-950 font-bold hover:bg-yellow-hover disabled:opacity-50 text-sm transition-colors shadow-md text-center"
+            className="px-6 py-3 rounded-xl bg-yellow text-slate-950 font-black hover:bg-yellow-hover disabled:opacity-50 text-sm transition-all shadow-md text-center"
           >
             {isSaving ? "Saving Perimeter..." : "Save Alert Perimeter"}
           </button>

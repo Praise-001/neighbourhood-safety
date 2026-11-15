@@ -57,50 +57,51 @@ function StatusContent() {
   const sevConfig = ticket ? SEVERITIES.find((s) => s.value === ticket.severity) : null;
 
   return (
-    <div className="max-w-2xl w-full mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-2xl w-full mx-auto px-4 py-10 space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+        <h1 className="text-3xl font-black tracking-tight text-foreground">
           Incident Status Lookup
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Enter your reference code to view the live status and verified community updates.
+        <p className="text-xs sm:text-sm text-muted-foreground">
+          Enter your 8-character reference code (e.g. <strong>MCR-8101</strong>) to view status and updates.
         </p>
       </div>
 
-      <form onSubmit={handleSearch} className="flex gap-2">
+      <form onSubmit={handleSearch} className="flex gap-2 bg-card p-2 rounded-2xl border border-border shadow-sm">
         <input
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           placeholder="e.g. MCR-8101"
           maxLength={15}
-          className="flex-1 px-4 py-3 text-base sm:text-lg font-mono tracking-wider rounded-lg border border-border bg-card text-foreground uppercase placeholder:normal-case placeholder:font-sans placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow"
+          className="flex-1 px-4 py-3 text-base sm:text-lg font-mono tracking-wider bg-transparent text-foreground uppercase placeholder:normal-case placeholder:font-sans placeholder:text-muted-foreground focus:outline-none"
         />
         <button
           type="submit"
           disabled={loading || !code.trim()}
-          className="px-6 py-3 rounded-lg bg-yellow text-slate-950 font-bold hover:bg-yellow-hover disabled:opacity-50 transition-colors shadow-md text-sm sm:text-base"
+          className="px-6 py-3 rounded-xl bg-yellow text-slate-950 font-bold hover:bg-yellow-hover disabled:opacity-50 transition-colors shadow-sm text-sm sm:text-base whitespace-nowrap"
         >
           {loading ? "Searching..." : "Lookup"}
         </button>
       </form>
 
       {error && (
-        <div className="p-4 rounded-lg bg-red-100 border border-red-300 text-red-800 dark:bg-red-950/50 dark:border-red-800 dark:text-red-200 text-sm">
-          ⚠️ {error}
+        <div className="p-4 rounded-xl bg-red-100 border border-red-300 text-red-800 dark:bg-red-950/60 dark:border-red-900 dark:text-red-200 text-sm flex items-center gap-2">
+          <span>⚠️</span>
+          <span>{error}</span>
         </div>
       )}
 
       {ticket && (
-        <div className="bg-card border border-border rounded-xl p-6 space-y-5 shadow-md">
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-border">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{catConfig?.icon || "⚠️"}</span>
+        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 space-y-5 shadow-md animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{catConfig?.icon || "⚠️"}</span>
               <div>
-                <span className="text-xs font-mono font-bold text-yellow">
+                <span className="text-xs font-mono font-bold text-yellow bg-navy px-2 py-0.5 rounded">
                   {ticket.reference_code}
                 </span>
-                <h2 className="text-lg font-bold text-foreground">{ticket.title}</h2>
+                <h2 className="text-lg font-bold text-foreground mt-1">{ticket.title}</h2>
               </div>
             </div>
 
@@ -124,10 +125,10 @@ function StatusContent() {
 
           <div className="space-y-3 text-sm">
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Description
               </h3>
-              <p className="mt-1 text-foreground leading-relaxed whitespace-pre-wrap">
+              <p className="mt-1 text-foreground leading-relaxed whitespace-pre-wrap bg-background p-3.5 rounded-xl border border-border">
                 {ticket.description}
               </p>
             </div>
@@ -135,26 +136,26 @@ function StatusContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
               <div>
                 <span className="text-muted-foreground">Location: </span>
-                <span className="font-medium text-foreground">
+                <span className="font-semibold text-foreground">
                   {ticket.location_name || `${ticket.public_lat}, ${ticket.public_lng}`}
                 </span>
               </div>
               <div>
                 <span className="text-muted-foreground">Reported: </span>
-                <span className="font-medium text-foreground">
+                <span className="font-semibold text-foreground">
                   {new Date(ticket.incident_time).toLocaleString()}
                 </span>
               </div>
               <div>
-                <span className="text-muted-foreground">Community confirmations: </span>
-                <span className="font-bold text-foreground">
-                  {ticket.confirmation_count} neighbours
+                <span className="text-muted-foreground">Confirmations: </span>
+                <span className="font-bold text-yellow">
+                  👍 {ticket.confirmation_count} neighbours
                 </span>
               </div>
               <div>
-                <span className="text-muted-foreground">Anonymous: </span>
-                <span className="font-medium text-foreground">
-                  {ticket.is_anonymous ? "Yes (Protected)" : "No"}
+                <span className="text-muted-foreground">Identity: </span>
+                <span className="font-semibold text-foreground">
+                  {ticket.is_anonymous ? "Anonymous (Protected)" : "Verified Resident"}
                 </span>
               </div>
             </div>
@@ -162,10 +163,10 @@ function StatusContent() {
 
           {ticket.photo_url && (
             <div className="pt-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                Attached Photo
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                Attached Photo Evidence
               </h3>
-              <div className="rounded-lg overflow-hidden border border-border max-h-72 w-full bg-black/10">
+              <div className="rounded-xl overflow-hidden border border-border max-h-72 w-full bg-black/10">
                 <img
                   src={ticket.photo_url}
                   alt={ticket.title}
@@ -178,23 +179,24 @@ function StatusContent() {
           <div className="pt-4 border-t border-border flex justify-between items-center">
             <Link
               href={`/tickets/${ticket.id}`}
-              className="text-xs sm:text-sm font-semibold text-yellow hover:underline flex items-center gap-1"
+              className="text-xs sm:text-sm font-bold text-yellow hover:underline flex items-center gap-1"
             >
-              Open Full Detail & Discussion Page →
+              Open Full Detail & Discussion Dossier →
             </Link>
             <Link
               href="/map"
               className="text-xs text-muted-foreground hover:text-foreground"
             >
-              View on Map
+              View on Live Map
             </Link>
           </div>
         </div>
       )}
 
       {searched && !loading && !ticket && !error && (
-        <div className="text-center py-8 text-muted-foreground text-sm">
-          No report found with code <strong>{code}</strong>.
+        <div className="text-center py-12 text-muted-foreground text-sm bg-card rounded-2xl border border-border p-6 space-y-2">
+          <p className="font-bold text-foreground">No incident found with code &quot;{code}&quot;.</p>
+          <p className="text-xs">Please double check your reference code or search another incident.</p>
         </div>
       )}
     </div>
@@ -203,7 +205,7 @@ function StatusContent() {
 
 export default function StatusPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading status page...</div>}>
+    <Suspense fallback={<div className="p-12 text-center text-muted-foreground text-xs">Loading status lookup...</div>}>
       <StatusContent />
     </Suspense>
   );

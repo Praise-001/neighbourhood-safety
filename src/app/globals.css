@@ -5,9 +5,10 @@
 
 :root {
   --background: #f8fafc;
-  --foreground: #0b192c;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #0b192c;
+  --card-foreground: #0f172a;
+  --card-hover: #f1f5f9;
   --navy: #0b192c;
   --navy-light: #1e3e62;
   --navy-dark: #060d17;
@@ -17,22 +18,25 @@
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
   --border: #e2e8f0;
+  --border-focus: #f59e0b;
 }
 
 .dark {
-  --background: #060d17;
+  --background: #090e17;
   --foreground: #f8fafc;
-  --card: #0b192c;
+  --card: #0f172a;
   --card-foreground: #f8fafc;
-  --navy: #0b192c;
-  --navy-light: #1e3e62;
-  --navy-dark: #03070d;
+  --card-hover: #162238;
+  --navy: #090e17;
+  --navy-light: #1e293b;
+  --navy-dark: #04070c;
   --yellow: #fbbf24;
-  --yellow-light: #78350f;
+  --yellow-light: #451a03;
   --yellow-hover: #f59e0b;
-  --muted: #132238;
+  --muted: #131d2e;
   --muted-foreground: #94a3b8;
-  --border: #1e3e62;
+  --border: #1e293b;
+  --border-focus: #fbbf24;
 }
 
 @theme inline {
@@ -40,6 +44,7 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-card-hover: var(--card-hover);
   --color-navy: var(--navy);
   --color-navy-light: var(--navy-light);
   --color-navy-dark: var(--navy-dark);
@@ -49,10 +54,51 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-border-focus: var(--border-focus);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   min-height: 100vh;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* MapLibre custom popup styling */
+.maplibregl-popup-content {
+  background: var(--card) !important;
+  color: var(--foreground) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.875rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--card) !important;
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--card) !important;
+}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--card) !important;
+}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--card) !important;
 }

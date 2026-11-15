@@ -66,7 +66,6 @@ export function LocationPicker({
       });
     });
 
-    // Also click anywhere on the map to place marker
     map.on("click", (e: maplibregl.MapMouseEvent) => {
       marker.setLngLat(e.lngLat);
       onChange({
@@ -85,7 +84,7 @@ export function LocationPicker({
     };
   }, []);
 
-  // Update marker position if external lat/lng changes
+  // Sync external coordinates
   useEffect(() => {
     if (markerRef.current && mapRef.current && lat && lng) {
       const cur = markerRef.current.getLngLat();
@@ -132,7 +131,7 @@ export function LocationPicker({
     );
   };
 
-  // Handle Address Search (Only on button press, never as-you-type)
+  // Address search on button press only (S2-02)
   const handleAddressSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim() || searchQuery.trim().length < 3) {
@@ -154,7 +153,7 @@ export function LocationPicker({
       }
 
       if (!data.results || data.results.length === 0) {
-        setSearchError("No locations found. Try a different street, area, or postcode.");
+        setSearchError("No locations found. Try a different street or postcode.");
         return;
       }
 
@@ -186,44 +185,48 @@ export function LocationPicker({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
-        <label className="text-sm font-semibold text-foreground">
-          Incident Location <span className="text-red-500">*</span>
-        </label>
+      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
+        <div>
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+            Incident Location <span className="text-red-500">*</span>
+          </label>
+          <span className="text-[11px] text-muted-foreground">
+            Pin the exact location on the map. Drag pin or search address below.
+          </span>
+        </div>
 
         <button
           type="button"
           onClick={handleGetLocation}
           disabled={isLocating}
-          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-navy text-white hover:bg-navy-light transition-colors border border-border focus:ring-2 focus:ring-yellow disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors shadow-2xs disabled:opacity-50"
         >
-          <svg className="w-3.5 h-3.5 text-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          {isLocating ? "Acquiring GPS..." : "Use Current GPS"}
+          <span className="text-yellow text-sm">📍</span>
+          <span>{isLocating ? "Acquiring GPS..." : "Use My GPS"}</span>
         </button>
       </div>
 
       {locationStatus && (
-        <p className="text-xs text-muted-foreground">{locationStatus}</p>
+        <p className="text-xs text-yellow font-medium">{locationStatus}</p>
       )}
 
-      {/* Address Search on Button Press Only (S2-02) */}
+      {/* Address Search on Button Press Only */}
       <form onSubmit={handleAddressSearch} className="flex gap-2">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search street, neighbourhood, or postcode..."
-          className="flex-1 px-3 py-2 text-xs sm:text-sm rounded-md border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow"
-        />
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search address, street name, or postcode..."
+            className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow shadow-2xs"
+          />
+        </div>
         <button
           type="submit"
           disabled={isSearching}
-          className="px-4 py-2 text-xs sm:text-sm font-semibold rounded-md bg-yellow text-slate-950 hover:bg-yellow-hover disabled:opacity-50 transition-colors shadow-sm"
+          className="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-yellow text-slate-950 hover:bg-yellow-hover disabled:opacity-50 transition-colors shadow-2xs whitespace-nowrap"
         >
-          {isSearching ? "Searching..." : "Search"}
+          {isSearching ? "Searching..." : "Find"}
         </button>
       </form>
 
@@ -232,41 +235,44 @@ export function LocationPicker({
       )}
 
       {searchResults.length > 0 && (
-        <ul className="border border-border rounded-md bg-card divide-y divide-border overflow-hidden text-xs shadow-md">
+        <ul className="border border-border rounded-xl bg-card divide-y divide-border overflow-hidden text-xs shadow-lg max-h-48 overflow-y-auto z-10">
           {searchResults.map((item, idx) => (
             <li key={idx}>
               <button
                 type="button"
                 onClick={() => handleSelectResult(item)}
-                className="w-full text-left px-3 py-2 hover:bg-muted transition-colors flex items-center justify-between"
+                className="w-full text-left px-3.5 py-2.5 hover:bg-muted/60 transition-colors flex items-center justify-between gap-2"
               >
-                <span className="truncate pr-2">{item.display_name}</span>
-                <span className="text-yellow text-xs font-bold">Select</span>
+                <span className="truncate text-foreground font-medium">{item.display_name}</span>
+                <span className="text-yellow font-bold text-[11px] whitespace-nowrap">Select →</span>
               </button>
             </li>
           ))}
         </ul>
       )}
 
-      {/* Draggable Map */}
-      <div className="relative rounded-lg overflow-hidden border border-border shadow-inner">
+      {/* Draggable Map Canvas */}
+      <div className="relative rounded-xl overflow-hidden border border-border shadow-inner">
         <div
           ref={mapContainerRef}
-          className="w-full h-64 sm:h-72 bg-slate-200 dark:bg-slate-800"
+          className="w-full h-64 sm:h-72 bg-slate-200 dark:bg-slate-900"
         />
-        <div className="absolute bottom-2 left-2 bg-card/90 backdrop-blur px-2.5 py-1 rounded text-[11px] font-medium border border-border shadow-sm text-foreground">
-          📍 Drag pin or click map to adjust location
+        <div className="absolute bottom-2.5 left-2.5 bg-card/90 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-semibold border border-border shadow-sm text-foreground flex items-center gap-1.5">
+          <span>🎯</span>
+          <span>Drag yellow marker or click anywhere to adjust location</span>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground bg-muted/50 p-2.5 rounded-md border border-border">
-        <div>
-          <span>Lat: <strong>{lat.toFixed(5)}</strong></span>
-          <span className="ml-3">Lng: <strong>{lng.toFixed(5)}</strong></span>
+      {/* Coordinate & Area Details Card */}
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground bg-card/60 p-3 rounded-xl border border-border shadow-2xs">
+        <div className="flex items-center gap-3">
+          <span>Lat: <strong className="text-foreground font-mono">{lat.toFixed(5)}</strong></span>
+          <span>Lng: <strong className="text-foreground font-mono">{lng.toFixed(5)}</strong></span>
         </div>
         {locationName && (
-          <div className="truncate max-w-xs font-medium text-foreground">
-            {locationName}
+          <div className="truncate max-w-xs font-semibold text-foreground flex items-center gap-1">
+            <span>📌</span>
+            <span>{locationName}</span>
           </div>
         )}
       </div>

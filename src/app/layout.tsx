@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Neighbourhood Safety | Community Incident Reporting",
+  title: "Neighbourhood Safety | Community Incident Reporting & Realtime Map",
   description:
-    "Report incidents quickly, view local community alerts on an interactive map, and stay informed.",
+    "Report safety incidents in seconds, explore verified community reports on a live map, and get instant radius alerts before danger reaches your street.",
 };
 
 const themeScript = `
@@ -47,60 +47,128 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-yellow selection:text-navy`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-yellow selection:text-slate-950`}
       >
         <DisclaimerBanner />
-        <header className="sticky top-0 z-40 w-full border-b border-border bg-card/90 backdrop-blur">
+
+        {/* Global Navigation Header */}
+        <header className="sticky top-0 z-40 w-full border-b border-border bg-card/85 backdrop-blur-md transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            {/* Brand Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 font-bold text-lg text-foreground hover:opacity-90 transition-opacity"
+              className="flex items-center gap-2.5 font-bold text-lg text-foreground group transition-all"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy text-yellow font-black border border-yellow/30 text-base shadow-sm">
-                !
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy text-yellow shadow-md border border-yellow/30 group-hover:scale-105 transition-transform">
+                <svg
+                  className="w-5 h-5 text-yellow"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.2}
+                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.2}
+                    d="M12 8v4m0 4h.01"
+                  />
+                </svg>
               </span>
-              <span className="tracking-tight">
-                Neighbourhood<span className="text-yellow font-extrabold">Safety</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="tracking-tight text-base sm:text-lg font-black leading-none text-foreground">
+                  Neighbourhood<span className="text-yellow">Safety</span>
+                </span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mt-0.5">
+                  Community Network
+                </span>
+              </div>
             </Link>
 
-            <nav className="flex items-center gap-2 sm:gap-4">
+            {/* Navigation Links */}
+            <nav className="flex items-center gap-1 sm:gap-2">
               <Link
                 href="/map"
-                className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+                className="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex items-center gap-1.5"
               >
-                Live Map
+                <span>🗺️</span>
+                <span className="hidden sm:inline">Live Map</span>
               </Link>
               <Link
                 href="/alerts"
-                className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+                className="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex items-center gap-1.5"
               >
-                Alerts
+                <span>🔔</span>
+                <span className="hidden sm:inline">Alerts</span>
               </Link>
               <Link
                 href="/status"
-                className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+                className="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex items-center gap-1.5"
               >
-                Lookup
+                <span>🔍</span>
+                <span className="hidden sm:inline">Lookup</span>
               </Link>
               <Link
-                href="/report"
-                className="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-md bg-yellow text-slate-950 hover:bg-yellow-hover transition-colors shadow-sm"
+                href="/admin"
+                className="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors hidden md:flex items-center gap-1.5"
               >
-                + Report
+                <span>🛡️</span>
+                <span>Moderation</span>
               </Link>
+
+              <div className="h-4 w-px bg-border mx-1" />
+
+              <Link
+                href="/report"
+                className="px-3.5 py-1.5 rounded-lg bg-yellow text-slate-950 font-bold text-xs sm:text-sm hover:bg-yellow-hover transition-all shadow-sm flex items-center gap-1.5 hover:shadow-md"
+              >
+                <span>+</span>
+                <span>Report</span>
+              </Link>
+
               <ThemeToggle />
             </nav>
           </div>
         </header>
 
+        {/* Realtime Alert Provider & Page Children */}
         <RealtimeAlertsProvider>
           <main className="flex-1 flex flex-col">{children}</main>
         </RealtimeAlertsProvider>
 
-        <footer className="border-t border-border bg-card py-6 text-center text-xs text-muted-foreground">
-          <div className="max-w-7xl mx-auto px-4">
-            Neighbourhood Safety Academic Prototype · Zero-cost architecture · Synthetic data only
+        {/* Polished Footer */}
+        <footer className="border-t border-border bg-card/60 backdrop-blur py-8 text-xs text-muted-foreground mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-foreground">NeighbourhoodSafety</span>
+              <span>·</span>
+              <span>Academic Prototype</span>
+              <span>·</span>
+              <span className="text-yellow">Synthetic Data Only</span>
+            </div>
+
+            <div className="flex items-center gap-4 text-[11px]">
+              <Link href="/map" className="hover:text-foreground transition-colors">
+                Map View
+              </Link>
+              <Link href="/alerts" className="hover:text-foreground transition-colors">
+                Perimeter Alerts
+              </Link>
+              <Link href="/status" className="hover:text-foreground transition-colors">
+                Status Lookup
+              </Link>
+              <Link href="/admin" className="hover:text-foreground transition-colors">
+                Admin Queue
+              </Link>
+              <Link href="/auth" className="hover:text-foreground transition-colors">
+                Sign In
+              </Link>
+            </div>
           </div>
         </footer>
       </body>
