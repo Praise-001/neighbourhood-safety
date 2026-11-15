@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "proof": "node scripts/privacy-proof.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
