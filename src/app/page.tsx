@@ -1,7 +1,31 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/types";
+import { supabase } from "@/lib/supabase/client";
 
-export default function Home() {
+export const revalidate = 60; // ISR cache revalidation every 60 seconds
+
+async function getActiveIncidentCount(): Promise<number | null> {
+  try {
+    const { count, error } = await supabase
+      .from("tickets")
+      .select("*", { count: "exact", head: true })
+      .eq("hidden", false)
+      .gt("expires_at", new Date().toISOString());
+
+    if (error) {
+      console.error("Error fetching incident count:", error.message);
+      return null;
+    }
+    return count;
+  } catch (err) {
+    console.error("Unexpected error fetching incident count:", err);
+    return null;
+  }
+}
+
+export default async function Home() {
+  const activeCount = await getActiveIncidentCount();
+
   return (
     <div className="flex-1 flex flex-col">
       {/* Hero Section */}
@@ -52,9 +76,11 @@ export default function Home() {
           </div>
 
           {/* Metric Highlights */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto pt-8 border-t border-border/60">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto pt-8 border-t border-border/60">
             <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-left">
-              <span className="text-2xl font-black text-foreground">30+</span>
+              <span className="text-2xl font-black text-foreground">
+                {activeCount !== null ? activeCount : "Live"}
+              </span>
               <p className="text-xs text-muted-foreground mt-0.5 font-medium">
                 Active Local Incidents
               </p>
@@ -65,10 +91,12 @@ export default function Home() {
                 Fast Reporting Flow
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-left">
-              <span className="text-2xl font-black text-foreground">100%</span>
-              <p className="text-xs text-muted-foreground mt-0.5 font-medium">
-                Privacy Stripping & Rounding
+            <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-left flex flex-col justify-center">
+              <span className="text-xs font-bold text-foreground block">
+                Privacy Protection
+              </span>
+              <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                Photo location data is removed before upload; sensitive categories show approximate locations only.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-card border border-border shadow-xs text-left">
@@ -147,7 +175,7 @@ export default function Home() {
                 Live Interactive Map & Clustering
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                MapLibre GL map powered by OpenStreetMap. Incidents group into dynamic clusters with color-coded severity markers, time range filters, and a distance-aware feed list.
+                MapLibre GL map powered by OpenFreeMap. Incidents group into dynamic clusters with color-coded severity markers, time range filters, and a distance-aware feed list.
               </p>
             </div>
 
