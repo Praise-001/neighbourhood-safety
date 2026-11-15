@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { DisclaimerBanner } from "@/components/disclaimer-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { RealtimeAlertsProvider } from "@/components/realtime-alerts-provider";
 import Link from "next/link";
 
 const geistSans = Geist({
@@ -93,7 +94,9 @@ export default function RootLayout({
           </div>
         </header>
 
-        <main className="flex-1 flex flex-col">{children}</main>
+        <RealtimeAlertsProvider>
+          <main className="flex-1 flex flex-col">{children}</main>
+        </RealtimeAlertsProvider>
 
         <footer className="border-t border-border bg-card py-6 text-center text-xs text-muted-foreground">
           <div className="max-w-7xl mx-auto px-4">

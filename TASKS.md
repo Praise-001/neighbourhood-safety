@@ -33,9 +33,9 @@ Scope and rules: `docs/adr/0004-sprint-scope.md`. Work strictly top to bottom. E
 - [x] S3-04 *(optional)* Email magic-link sign-in; signed-in users get their reports linked to them.
 
 ## Block 4: Alerts (60 min)
-- [ ] S4-01 Alert settings page: set home on the map, choose radius.
-- [ ] S4-02 Supabase Realtime subscription on `tickets`: when a new ticket is created inside the radius, show an in-app banner; critical severity gets a stronger style.
-- [ ] S4-03 Test with two browser windows: report in one, alert in the other inside the radius, none outside.
+- [x] S4-01 Alert settings page: set home on the map, choose radius.
+- [x] S4-02 Supabase Realtime subscription on `tickets`: when a new ticket is created inside the radius, show an in-app banner; critical severity gets a stronger style.
+- [x] S4-03 Test with two browser windows: report in one, alert in the other inside the radius, none outside.
 
 ## Block 5: Trust and admin (60 min)
 - [ ] S5-01 Flag-as-false button; auto-hide at 3 flags.
